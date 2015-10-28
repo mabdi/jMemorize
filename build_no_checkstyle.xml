@@ -3,7 +3,7 @@
 
     <!-- set global properties for this build -->
     <property name="src" value="src" />
-    <property name="build" value="build" />
+    <property name="build" value="bin" />
     <property name="dist" value="dist" />
     <property name="win" value="win" />
 
@@ -29,7 +29,7 @@
     <property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
 
     <property name="project.name" value="jMemorize" />
-    <property name="project.version" value="1.3.0" />
+    <property name="project.version" value="1.3.1b" />
     <property name="project.file" value="${project.name}-${project.version}" />
 
     <path id="project.class.path">
@@ -45,6 +45,7 @@
 		<pathelement location="${lib}/svnjavahl.jar" /> 
 		<pathelement location="${lib}/svnant.jar" />
 		<pathelement location="${lib}/svnClientAdapter.jar" />
+        <pathelement location="${lib}/AppleJavaExtensions.jar" />
     </path>
 
     <path id="checks.build.class.path">
@@ -57,7 +58,7 @@
     </path>
     
     <!-- fill in your dirs if you want to build the windows installer -->
-    <property name="dir.jsmooth" value="C:/Programme/JSmooth 0.9.7" />
+    <property name="dir.jsmooth" value="C:/Programme/JSmooth 0.9.9-7" />
     <property name="dir.nsis" value="C:/Programme/NSIS" />
 
     <target name="init">
@@ -75,30 +76,7 @@
 		<echo message="current revision: ${svn.revision.max-with-flags}"/>
     </target>
 
-    <!-- Checkstyle target : build the custom checks -->
-    <target name="build-checks" depends="init" description="build the custom checkstyle checks">
-        <mkdir dir="${checks-bin}" />
-        <javac srcdir="${checks-src}" destdir="${checks-bin}"  deprecation="true">
-            <classpath refid="checks.build.class.path" />
-        </javac>
-        <mkdir dir="${checks-jar}" />
-		<copy file="${checks-base}/checkstyle_packages.xml" 
-	    todir="${checks-bin}"/>
-        <jar jarfile="${checks-jar}/jmemorize-style-checks.jar" 
-            basedir="${checks-bin}"/>
-    </target>
-
-    <!-- Checkstyle target : run the checks on all the source code -->
-    <target name="checkstyle" depends="build-checks">
-        <taskdef resource="checkstyletask.properties">
-	    <classpath refid="checks.run.class.path"/>
-	</taskdef>
-        <checkstyle config="${checks-base}/jmemorize-checkstyle.xml">
-	    <fileset dir="src/jmemorize" includes="**/*.java"/>
-	</checkstyle>    
-    </target>
-
-    <target name="compile" depends="init, checkstyle" description="Compile the source">
+    <target name="compile" depends="init" description="Compile the source">
         <mkdir dir="${build}" />
 
         <!-- Compile the java code from ${src} into ${build} -->
@@ -107,7 +85,7 @@
         </javac>
 
         <!-- Convert translations from native format to ascii format -->
-        <native2ascii src="${resource}/text" dest="${build}/${resource}/text" 
+        <native2ascii encoding="UTF-8" src="${resource}/text" dest="${build}/${resource}/text" 
             includes="translation_*.native" ext=".properties"/>
         
         <copy todir="${build}/${resource}">
@@ -141,7 +119,7 @@
 
         <java classpath="${build}" classname="jmemorize.core.Main" fork="true">
             <classpath refid="project.class.path" />
-	    <jvmarg value="-ea"/>
+	    	<jvmarg value="-ea" />
         </java>
     </target>
 
@@ -221,12 +199,14 @@
         <copy todir="${dist.src.temp}/${project.file}/${checks-src}">
             <fileset dir="${checks-src}" />
         </copy>
+        
         <copy todir="${dist.src.temp}/${project.file}/${checks-lib}">
             <fileset dir="${checks-lib}" />
         </copy>
+        
         <copy todir="${dist.src.temp}/${project.file}/${checks-base}">
-            <fileset file="*.xml" />
-            <fileset file="gpl-header-check.txt" />
+            <fileset file="${checks-base}/*.xml" />
+            <fileset file="${checks-base}/gpl-header-check.txt" />
         </copy>
         
         <!-- Copy additional files -->
@@ -303,6 +283,7 @@
 
         <taskdef classpath="${lib.statcvs}" name="statcvs" 
             classname="net.sf.statcvs.ant.StatCvsTask" />
+        
         <statcvs projectDirectory="${basedir}" 
             cvsLogFile="${basedir}/${dist.statcvs}/cvs.log" 
             outputDirectory="${basedir}/${dist.statcvs}" 
@@ -333,14 +314,15 @@
                 <pathelement location="${build}"/>
             </classpath>
             <formatter type="xml"/>
-	    <jvmarg value="-ea"/>
+	    	<jvmarg value="-ea"/>
             <test name="jmemorize.core.test.AllTests" todir="${test.output}"/>
         </junit>
         
         <junitreport todir="${test.report}">
             <fileset dir="${test.output}">
-                <include name="*.xml"/>
+            	<include name="*.xml"/>
             </fileset>
+            
             <report format="frames" todir="${test.report}"/>
         </junitreport>
     </target>

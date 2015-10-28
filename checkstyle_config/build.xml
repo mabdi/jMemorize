@@ -7,7 +7,8 @@
     <property name="dist" value="dist" />
     <property name="win" value="win" />
 
-    <property name="checks-base" value="checkstyle_config" />
+    <!--  property name="checks-base" value="checkstyle_config" /> -->
+    <property name="checks-base" value="." />
     <property name="checks-src" value="${checks-base}/src" />
     <property name="checks-bin" value="${checks-base}/bin" />
     <property name="checks-jar" value="${checks-base}/jar" />
