@@ -129,22 +129,22 @@ public class MainMenu extends JMenuBar implements RecentItemsObserver
         
         menu.add(new JMenuItem(new OpenURLAction(
             Localization.get("URL.HOMEPAGE"), //$NON-NLS-1$
-            "http://jmemorize.org" //$NON-NLS-1$
+            "http://mabdi.github.io/jMemorize-Plus-1" //$NON-NLS-1$
         )));
         
         menu.add(new JMenuItem(new OpenURLAction(
             Localization.get("URL.MANUAL"), //$NON-NLS-1$
-            "http://wiki.jmemorize.org/User_Manual" //$NON-NLS-1$
+            "https://github.com/mabdi/jMemorize-Plus-1/wiki" //$NON-NLS-1$
         )));
         
         menu.add(new JMenuItem(new OpenURLAction(
             Localization.get("URL.FEATURE_TRACKER"), //$NON-NLS-1$
-            "http://sourceforge.net/tracker/?group_id=121967&atid=691941" //$NON-NLS-1$
+            "https://github.com/mabdi/jMemorize-Plus-1/issues" //$NON-NLS-1$
         )));
         
         menu.add(new JMenuItem(new OpenURLAction(
             Localization.get("URL.BUG_TRACKER"), //$NON-NLS-1$
-            "http://sourceforge.net/tracker/?group_id=121967&atid=691938" //$NON-NLS-1$
+            "https://github.com/mabdi/jMemorize-Plus-1/issues" //$NON-NLS-1$
         )));
         
         return menu;
