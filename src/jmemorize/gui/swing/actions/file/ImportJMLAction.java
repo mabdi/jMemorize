@@ -20,46 +20,55 @@ package jmemorize.gui.swing.actions.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.filechooser.FileFilter;
 
+import jmemorize.core.Card;
 import jmemorize.core.Lesson;
+import jmemorize.core.Main;
 import jmemorize.core.io.XmlBuilder;
 import jmemorize.gui.LC;
 import jmemorize.gui.Localization;
+import jmemorize.gui.swing.frames.ImportFrame;
 import jmemorize.gui.swing.frames.MainFrame;
 
-public class ImportJMLAction extends AbstractImportAction
-{
-    public ImportJMLAction()
-    {
-        setValues();
-    }
-    
-    /* (non-Javadoc)
-     * @see jmemorize.gui.swing.actions.file.AbstractImportAction
-     */
-    protected void doImport(File file, Lesson lesson) throws IOException
-    {
-        try
-        {
-            XmlBuilder.loadFromXMLFile(file, lesson);
-        } 
-        catch (Exception e)
-        {
-            throw new IOException(e.getLocalizedMessage());
-        }
-    }
+public class ImportJMLAction extends AbstractImportAction {
+	public ImportJMLAction() {
+		setValues();
+	}
 
-    protected FileFilter getFileFilter()
-    {
-        return MainFrame.FILE_FILTER;
-    }
-    
-    private void setValues()
-    {
-        setName(Localization.get(LC.FILE_FILTER_DESC));
-        setMnemonic(1);
-        setIcon("/resource/icons/file_saveas.gif"); //$NON-NLS-1$
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see jmemorize.gui.swing.actions.file.AbstractImportAction
+	 */
+	protected void doImport(File file, Lesson lesson) throws IOException {
+		try {
+			Lesson temp = new Lesson(false);
+			XmlBuilder.loadFromXMLFile(file, temp);
+			// Show Dialog to Select Nodes
+			ImportFrame frame = new ImportFrame(Main.getInstance().getFrame(),
+					temp);
+			// add all Selected Node to lesson
+			frame.setVisible(true);
+			List<Card> cards = frame.getSelectedCards();
+			if (cards != null)
+				for (Card card : cards) {
+					lesson.getRootCategory().addCard(card);
+				}
+		} catch (Exception e) {
+			throw new IOException(e.getLocalizedMessage());
+		}
+	}
+
+	protected FileFilter getFileFilter() {
+		return MainFrame.FILE_FILTER;
+	}
+
+	private void setValues() {
+		setName(Localization.get(LC.FILE_FILTER_DESC));
+		setMnemonic(1);
+		setIcon("/resource/icons/file_saveas.gif"); //$NON-NLS-1$
+	}
 }
