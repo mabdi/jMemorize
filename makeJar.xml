@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project jMemorize with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="E:/src/github/jMemorize/dist/jMemorizePlus1.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="jmemorize.core.Main"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ csv.jar forms-1.0.5.jar itext-1.4.8.jar jcommon-1.0.8.jar jfreechart-1.0.4.jar junit.jar servlet.jar svnant.jar svnClientAdapter.jar svnjavahl.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="E:/src/github/jMemorize/bin"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="csv.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="forms-1.0.5.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="itext-1.4.8.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="jcommon-1.0.8.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="jfreechart-1.0.4.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="junit.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="servlet.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="svnant.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="svnClientAdapter.jar"/>
+            <zipfileset dir="E:\src\github\jMemorize\lib" includes="svnjavahl.jar"/>
+        </jar>
+    </target>
+</project>
