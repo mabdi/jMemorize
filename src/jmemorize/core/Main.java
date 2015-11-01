@@ -70,7 +70,7 @@ public class Main extends Observable implements LearnSessionProvider,
         Preferences.userRoot().node("de/riad/jmemorize");          //$NON-NLS-1$
 
     private static final String         PROPERTIES_PATH         = 
-        "/resource/jMemorize.properties"; //$NON-NLS-1$
+        "/resource/jMemorizePlus1.properties"; //$NON-NLS-1$
 
     public static final File            STATS_FILE               = 
         new File(System.getProperty("user.home")+"/.jmemorize-stats.xml"); //$NON-NLS-1$ //$NON-NLS-2$

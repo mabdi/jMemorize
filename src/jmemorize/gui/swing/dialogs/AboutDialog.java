@@ -79,7 +79,7 @@ public class AboutDialog extends JDialog
         m_tabbedPane.addTab("License", buildLicensePanel());
         m_tabbedPane.addTab("Java Properties", buildPropertiesPanel());
         m_tabbedPane.addTab("Program Preferences", buildPreferencesPanel());
-        m_tabbedPane.setPreferredSize(new java.awt.Dimension(500, 300));
+        m_tabbedPane.setPreferredSize(new java.awt.Dimension(500, 400));
         
         m_tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e)
@@ -104,8 +104,8 @@ public class AboutDialog extends JDialog
             "<p>Build: " + 
             Main.PROPERTIES.getProperty("buildId") + //$NON-NLS-1$
             "</p>" + //$NON-NLS-1$
-            "<p><br>Homepage: http://jmemorize.org</p>" + //$NON-NLS-1$
-            "<p>2004-2008 Riad Djemili and contributors</p></html>"; //$NON-NLS-1$
+            "<p><br>Homepage: http://mabdi.github.io/jMemorize-Plus-1</p>" + //$NON-NLS-1$
+            "<p>2015 Mehrdad Abdi and contributors:</p><p><ul><li>M Azvari</li><li>M.A HosseinPour</li></ul></p></html>"; //$NON-NLS-1$
         
         JLabel titleLabel = new JLabel();
         ImageIcon icon = new ImageIcon(getClass().getResource("/resource/about.png"));
