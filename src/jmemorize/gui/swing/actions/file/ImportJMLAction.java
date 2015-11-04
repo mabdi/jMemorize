@@ -30,7 +30,7 @@ import jmemorize.core.Main;
 import jmemorize.core.io.XmlBuilder;
 import jmemorize.gui.LC;
 import jmemorize.gui.Localization;
-import jmemorize.gui.swing.frames.ImportFrame;
+import jmemorize.gui.swing.dialogs.ImportDialog;
 import jmemorize.gui.swing.frames.MainFrame;
 
 public class ImportJMLAction extends AbstractImportAction {
@@ -48,7 +48,7 @@ public class ImportJMLAction extends AbstractImportAction {
 			Lesson temp = new Lesson(false);
 			XmlBuilder.loadFromXMLFile(file, temp);
 			// Show Dialog to Select Nodes
-			ImportFrame frame = new ImportFrame(Main.getInstance().getFrame(),
+			ImportDialog frame = new ImportDialog(Main.getInstance().getFrame(),
 					temp);
 			// add all Selected Node to lesson
 			frame.setVisible(true);

@@ -127,7 +127,9 @@ public class DeckTablePanel extends JPanel implements CategoryObserver
                 CardTable.COLUMN_DECK, 
                 CardTable.COLUMN_CATEGORY, 
                 CardTable.COLUMN_TESTED, 
-                CardTable.COLUMN_EXPIRES});
+                CardTable.COLUMN_EXPIRES,
+                CardTable.COLUMN_RATIO,
+        });
         
         initComponents();
     }
