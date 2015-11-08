@@ -86,6 +86,7 @@ import jmemorize.gui.swing.actions.file.ExitAction;
 import jmemorize.gui.swing.actions.file.NewLessonAction;
 import jmemorize.gui.swing.actions.file.OpenLessonAction;
 import jmemorize.gui.swing.actions.file.SaveLessonAction;
+import jmemorize.gui.swing.dialogs.DropboxPushDialog;
 import jmemorize.gui.swing.dialogs.ErrorDialog;
 import jmemorize.gui.swing.dialogs.OkayButtonDialog;
 import jmemorize.gui.swing.panels.DeckChartPanel;
@@ -500,6 +501,18 @@ public class MainFrame extends JFrame implements CategoryObserver,
         }
     }
 
+    /**
+     * Saves the lesson or displays an error message if the operation failed.
+     * 
+     * @param file The path to the lesson. If <code>null</code> a file chooser
+     * is shown that allows the user to select the file.
+     */
+    public void openSyncDialog()
+    {
+        DropboxPushDialog dialg = new DropboxPushDialog(this);
+        dialg.setVisible(true);
+    }
+    
     /**
      * If lesson was modified this shows a dialog that asks if the user wants to
      * save the lesson before closing it.

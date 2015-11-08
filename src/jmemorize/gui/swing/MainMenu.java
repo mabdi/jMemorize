@@ -39,6 +39,7 @@ import jmemorize.gui.swing.actions.edit.FindAction;
 import jmemorize.gui.swing.actions.edit.PasteAction;
 import jmemorize.gui.swing.actions.edit.RemoveAction;
 import jmemorize.gui.swing.actions.edit.ResetCardAction;
+import jmemorize.gui.swing.actions.file.DropboxSyncAction;
 import jmemorize.gui.swing.actions.file.ExitAction;
 import jmemorize.gui.swing.actions.file.ExportToCSVAction;
 import jmemorize.gui.swing.actions.file.ExportToCleanLessonAction;
@@ -157,7 +158,7 @@ public class MainMenu extends JMenuBar implements RecentItemsObserver
         m_fileMenu.add(new OpenLessonAction());
         m_fileMenu.add(new SaveLessonAction());
         m_fileMenu.add(new SaveLessonAsAction());
-        
+        m_fileMenu.add(new DropboxSyncAction());
         // sub menu for import menu items
         JMenu importMenu = new JMenu(Localization.get("MainFrame.IMPORT")); //$NON-NLS-1$
         importMenu.setIcon(new ImageIcon(
