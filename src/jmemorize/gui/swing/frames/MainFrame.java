@@ -77,6 +77,7 @@ import jmemorize.gui.swing.actions.ShowCategoryTreeAction;
 import jmemorize.gui.swing.actions.SplitMainFrameAction;
 import jmemorize.gui.swing.actions.edit.AddCardAction;
 import jmemorize.gui.swing.actions.edit.AddCategoryAction;
+import jmemorize.gui.swing.actions.edit.DuplicateAction;
 import jmemorize.gui.swing.actions.edit.EditCardAction;
 import jmemorize.gui.swing.actions.edit.FindAction;
 import jmemorize.gui.swing.actions.edit.RemoveAction;
@@ -252,6 +253,7 @@ public class MainFrame extends JFrame implements CategoryObserver,
 
         EditCardFrame.getInstance().setVisible(false);
         FindFrame.getInstance().setVisible(false);
+        DuplicateFrame.getInstance().setVisible(false);
 
         updateFrameTitle();
     }
@@ -799,6 +801,7 @@ public class MainFrame extends JFrame implements CategoryObserver,
         
         operationsToolbar.add(new JButton(new AddCategoryAction(this)));
         operationsToolbar.add(new JButton(new FindAction()));
+        operationsToolbar.add(new JButton(new DuplicateAction()));
         operationsToolbar.add(new JButton(new LearnAction(this)));
         
         JPanel operationsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));

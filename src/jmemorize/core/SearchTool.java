@@ -19,8 +19,10 @@
 package jmemorize.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author djemili
@@ -87,4 +89,21 @@ public class SearchTool
         return positions;
     }
 
+    public static List<Card> searchDuplicates(List<Card> allcards){
+    	Map<String, List<Card>> cards = new HashMap<>();
+    	for (Card card : allcards) {
+    		String frontSide = card.getFrontSide().getText().getUnformatted().toLowerCase();
+    		if(!cards.containsKey(frontSide)){
+    			cards.put(frontSide, new ArrayList<Card>());
+    		}
+    		cards.get(frontSide).add(card);
+		}
+    	List<Card> foundCards = new LinkedList<Card>();
+    	for (List<Card> lists : cards.values()) {
+			if(lists.size()>1){
+				foundCards.addAll(lists);
+			}
+		}
+    	return foundCards;
+    }
 }

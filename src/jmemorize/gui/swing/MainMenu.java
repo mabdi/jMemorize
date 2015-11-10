@@ -34,6 +34,7 @@ import jmemorize.gui.swing.actions.edit.AddCardAction;
 import jmemorize.gui.swing.actions.edit.AddCategoryAction;
 import jmemorize.gui.swing.actions.edit.CopyAction;
 import jmemorize.gui.swing.actions.edit.CutAction;
+import jmemorize.gui.swing.actions.edit.DuplicateAction;
 import jmemorize.gui.swing.actions.edit.EditCardAction;
 import jmemorize.gui.swing.actions.edit.FindAction;
 import jmemorize.gui.swing.actions.edit.PasteAction;
@@ -119,6 +120,7 @@ public class MainMenu extends JMenuBar implements RecentItemsObserver
         editMenu.add(new JMenuItem(new ResetCardAction(provider)));
         editMenu.addSeparator();
         editMenu.add(new JMenuItem(new FindAction()));
+        editMenu.add(new JMenuItem(new DuplicateAction()));
         return editMenu;
     }
 
