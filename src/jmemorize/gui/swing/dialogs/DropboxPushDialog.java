@@ -11,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JButton;
@@ -36,8 +39,8 @@ public class DropboxPushDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = 1L;
 	protected static final String PREFS_DROPBOX_TOKEN = "dropbox.token";
-	final String APP_KEY = "fwplb5muypc3vaa";
-	final String APP_SECRET = "idmag7nslsucckf";
+	final String APP_KEY;
+	final String APP_SECRET;
 
 	private JButton btnPull;
 	private JButton btnPush;
@@ -54,10 +57,22 @@ public class DropboxPushDialog extends JDialog {
 		setTitle("Sync With Dropbox");
 		initComponents();
 		pack();
-
+		List<String> lines = null;
+		try {
+			File f = new File(DropboxPushDialog.class.getResource("/resource/text/dropbox.txt").toURI());
+			lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+		if (lines.size() == 2) {
+			APP_KEY = lines.get(0).trim();
+			APP_SECRET = lines.get(1).trim();
+		} else {
+			APP_KEY = "";
+			APP_SECRET = "";
+		}
 		appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 		config = new DbxRequestConfig("jMemmorizePlus1/1.0", Locale.getDefault().toString());
-
 	}
 
 	private void initComponents() {
@@ -106,7 +121,7 @@ public class DropboxPushDialog extends JDialog {
 						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Metadata: " + downloadedFile.toString());
 						outputStream.flush();
 						outputStream.close();
-						Main.getInstance().getFrame().loadLesson( temp );
+						Main.getInstance().getFrame().loadLesson(temp);
 					} catch (DbxException | IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
