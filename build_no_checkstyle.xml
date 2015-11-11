@@ -29,7 +29,7 @@
     <property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
 
     <property name="project.name" value="jMemorizePlus1" />
-    <property name="project.version" value="α0.1.0" />
+    <property name="project.version" value="v0.1.0alpha" />
     <property name="project.file" value="${project.name}-${project.version}" />
 
     <path id="project.class.path">
@@ -46,6 +46,9 @@
 		<pathelement location="${lib}/svnant.jar" />
 		<pathelement location="${lib}/svnClientAdapter.jar" />
         <pathelement location="${lib}/AppleJavaExtensions.jar" />
+    	
+    	<pathelement location="${lib}/dropbox-core-sdk-1.8.2.jar" />
+        <pathelement location="${lib}/jackson-core-2.6.1.jar" />
     </path>
 
     <path id="checks.build.class.path">
@@ -58,8 +61,8 @@
     </path>
     
     <!-- fill in your dirs if you want to build the windows installer -->
-    <property name="dir.jsmooth" value="C:/Programme/JSmooth 0.9.9-7" />
-    <property name="dir.nsis" value="C:/Programme/NSIS" />
+    <property name="dir.launch4j" value="C:\Program Files\Launch4j" />
+    <property name="dir.nsis" value="C:\Program Files\NSIS" />
 
     <target name="init">
         <!-- Create the time stamp -->
@@ -80,7 +83,7 @@
         <mkdir dir="${build}" />
 
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac srcdir="${src}" destdir="${build}" target="5" source="5" deprecation="true">
+        <javac srcdir="${src}" destdir="${build}"  deprecation="true">
             <classpath refid="project.class.path" />
         </javac>
 
@@ -228,27 +231,20 @@
 
         <!-- jsmooth: wrap jar in exe -->
         <copy file="${dist}/${project.version}/${project.file}.jar" 
-            todir="${dist.win.temp}" />
+            tofile="${dist.win.temp}/jar.jar" />
+        <!-- jMem.xml is launch4j configuration, built manually -->
+    	<copy file="${dist}/jMem.xml" 
+    	            todir="${dist.win.temp}" />    	
+        <copy file="jMemorize.ico" todir="${dist.win.temp}" />
 
-        <copy file="${win}/jMemorize.jsmooth.template" 
-		    tofile="${dist.win.temp}/jMemorize.jsmooth" />
-        
-        <replace file="${dist.win.temp}/jMemorize.jsmooth" >
-            <replacefilter token="@exefile" value="${project.file}.exe" />
-            <replacefilter token="@jarfile" value="${project.file}.jar" />
-        </replace>
-        
-        <copy file="${win}/jMemorize.ico" todir="${dist.win.temp}" />
-
-        <taskdef name="jsmoothgen"
-	        classname="net.charabia.jsmoothgen.ant.JSmoothGen"
-	        classpath="${dir.jsmooth}/lib/jsmoothgen-ant.jar"/>
-
-        <jsmoothgen project="${dist.win.temp}/jMemorize.jsmooth"
-	        skeletonroot="${dir.jsmooth}/skeletons"/>
+    	<exec executable="${dir.launch4j}/launch4jc.exe" dir="${dist.win.temp}">
+            <arg line="jMem.xml" />
+        </exec>
+        <move file="${dist.win.temp}/jar.exe" 
+            tofile="${dist.win.temp}/${project.file}.exe" />
 
         <!-- generate setup -->
-        <copy file="${win}/jMemorize.nsi.template" 
+        <copy file="${dist}/jMemorize.nsi.template" 
             tofile="${dist.win.temp}/jMemorize.nsi" />
         
         <replace file="${dist.win.temp}/jMemorize.nsi" >
@@ -256,7 +252,7 @@
             <replacefilter token="@exefile" value="${project.file}.exe" />
         </replace>
         
-        <copy file="${win}/gpl.txt" todir="${dist.win.temp}" />
+        <copy file="LICENSE" tofile="${dist.win.temp}/gpl.txt" />
 
         <exec executable="${dir.nsis}/makensis.exe" dir="${dist.win.temp}">
             <arg line="jMemorize.nsi" />
@@ -266,7 +262,7 @@
             todir="${dist}/${project.version}" />
     </target>
 
-    <target name="dist-full" depends="dist-bin, dist-src, dist-win" 
+    <target name="dist-full" depends="dist-bin, dist-win" 
         description="Create jar, src and win distribution" />
     
     <!-- This target needs the StatCVS Jar file location to be specified. -->

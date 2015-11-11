@@ -90,7 +90,7 @@ public class SearchTool
     }
 
     public static List<Card> searchDuplicates(List<Card> allcards){
-    	Map<String, List<Card>> cards = new HashMap<>();
+    	Map<String, List<Card>> cards = new HashMap<String, List<Card>>();
     	for (Card card : allcards) {
     		String frontSide = card.getFrontSide().getText().getUnformatted().toLowerCase();
     		if(!cards.containsKey(frontSide)){

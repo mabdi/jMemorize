@@ -61,7 +61,9 @@ public class DropboxPushDialog extends JDialog {
 		try {
 			File f = new File(DropboxPushDialog.class.getResource("/resource/text/dropbox.txt").toURI());
 			lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
-		} catch (URISyntaxException | IOException e) {
+		} catch (URISyntaxException eu) {
+			eu.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (lines.size() == 2) {
@@ -122,7 +124,9 @@ public class DropboxPushDialog extends JDialog {
 						outputStream.flush();
 						outputStream.close();
 						Main.getInstance().getFrame().loadLesson(temp);
-					} catch (DbxException | IOException e1) {
+					} catch (DbxException e0) {
+						e0.printStackTrace();
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} finally {
@@ -159,7 +163,7 @@ public class DropboxPushDialog extends JDialog {
 								DbxWriteMode.update(System.currentTimeMillis() + ""), inputFile.length(), inputStream);
 						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Uploaded: " + uploadedFile.toString());
 
-					} catch (DbxException | IOException e1) {
+					} catch ( Exception e1) {
 						e1.printStackTrace();
 					} finally {
 						try {
@@ -239,7 +243,7 @@ public class DropboxPushDialog extends JDialog {
 		client = new DbxClient(config, accessToken);
 		try {
 			JOptionPane.showMessageDialog(this, "Linked account: " + client.getAccountInfo().displayName);
-		} catch (HeadlessException | DbxException e) {
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(DropboxPushDialog.this,
 					"<HTML>Access Failed. Maybe token is not valid.<br/>Try again login.</HTML>");
 			e.printStackTrace();
