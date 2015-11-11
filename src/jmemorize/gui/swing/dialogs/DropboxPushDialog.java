@@ -2,17 +2,17 @@ package jmemorize.gui.swing.dialogs;
 
 import java.awt.Desktop;
 import java.awt.FlowLayout;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,6 +31,7 @@ import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
 
 import jmemorize.core.Main;
+import jmemorize.gui.Localization;
 
 public class DropboxPushDialog extends JDialog {
 
@@ -57,12 +58,15 @@ public class DropboxPushDialog extends JDialog {
 		setTitle("Sync With Dropbox");
 		initComponents();
 		pack();
-		List<String> lines = null;
+		BufferedReader in = null;
+		List<String> lines = new ArrayList<>();
 		try {
-			File f = new File(DropboxPushDialog.class.getResource("/resource/text/dropbox.txt").toURI());
-			lines = Files.readAllLines(f.toPath(), Charset.defaultCharset());
-		} catch (URISyntaxException eu) {
-			eu.printStackTrace();
+			in = new BufferedReader(new InputStreamReader(
+	                Localization.class.getResourceAsStream("/resource/text/dropbox.txt")));
+			String line;
+			while ((line = in.readLine()) != null){
+				lines.add(line);				
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
