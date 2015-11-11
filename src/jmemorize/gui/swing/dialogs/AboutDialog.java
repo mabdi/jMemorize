@@ -105,7 +105,9 @@ public class AboutDialog extends JDialog
             Main.PROPERTIES.getProperty("buildId") + //$NON-NLS-1$
             "</p>" + //$NON-NLS-1$
             "<p><br>Homepage: http://mabdi.github.io/jMemorize-Plus-1</p>" + //$NON-NLS-1$
-            "<p>2015 Mehrdad Abdi and contributors:</p><p><ul><li>M Azvari</li><li>M.A HosseinPour</li></ul></p></html>"; //$NON-NLS-1$
+            "<p>2015 Mehrdad Abdi and contributors:</p><p><ul><li>M Azvari</li><li>M.A HosseinPour</li></ul></p>" +
+            "<br/><p><small>It is a try to continue the jMemorize project available at: " +
+            "<a href=\"#\" >http://sourceforge.net/projects/jmemorize/</a></small></p></html>"; //$NON-NLS-1$
         
         JLabel titleLabel = new JLabel();
         ImageIcon icon = new ImageIcon(getClass().getResource("/resource/about.png"));

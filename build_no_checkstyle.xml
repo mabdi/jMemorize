@@ -29,7 +29,7 @@
     <property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
 
     <property name="project.name" value="jMemorizePlus1" />
-    <property name="project.version" value="1alpha" />
+    <property name="project.version" value="α0.1.0" />
     <property name="project.file" value="${project.name}-${project.version}" />
 
     <path id="project.class.path">
