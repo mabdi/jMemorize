@@ -92,11 +92,12 @@ public class SearchTool
     public static List<Card> searchDuplicates(List<Card> allcards){
     	Map<String, List<Card>> cards = new HashMap<String, List<Card>>();
     	for (Card card : allcards) {
-    		String frontSide = card.getFrontSide().getText().getUnformatted().toLowerCase();
-    		if(!cards.containsKey(frontSide)){
-    			cards.put(frontSide, new ArrayList<Card>());
+    		String frontSide = card.getFrontSide().getText().getUnformatted().toLowerCase().trim();
+    		String normalized = getNormal(frontSide);
+    		if(!cards.containsKey(normalized)){
+    			cards.put(normalized, new ArrayList<Card>());
     		}
-    		cards.get(frontSide).add(card);
+    		cards.get(normalized).add(card);
 		}
     	List<Card> foundCards = new LinkedList<Card>();
     	for (List<Card> lists : cards.values()) {
@@ -106,4 +107,34 @@ public class SearchTool
 		}
     	return foundCards;
     }
+
+    
+    /*
+     * ing
+     * es
+     * e
+     * s
+     * ed
+     * 
+     */
+    
+	private static String getNormal(String frontSide) {
+		if(frontSide.length()>4){
+			String[] suffixes = {
+					"ing",
+					"es",
+					"e",
+					"ed",
+			};
+			for (String string : suffixes) {
+				if(frontSide.endsWith(string)){
+					frontSide = frontSide.substring(0, frontSide.length() - string.length());
+					break;
+				}
+			}
+			return frontSide;
+		}else{			
+			return frontSide;
+		}
+	}
 }

@@ -137,7 +137,7 @@ public class DuplicateFrame extends EscapableFrame
     {
         List<Card> results = SearchTool.searchDuplicates(m_searchCategory.getCards());
         
-        m_cardTable.getView().setCards(results, m_searchCategory);
+        m_cardTable.getView().setCards(results, m_searchCategory,false);
     }
 
     public boolean close()

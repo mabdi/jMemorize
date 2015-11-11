@@ -1,5 +1,9 @@
 <project name="jMemorizePlus1" basedir="." default="compile">
-    <description>jMemorize Project.</description>
+    <description>jMemorize+1 Project.</description>
+	
+	
+
+    <property name="project.version" value="v0.1.2alpha" />
 
     <!-- set global properties for this build -->
     <property name="src" value="src" />
@@ -29,7 +33,6 @@
     <property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
 
     <property name="project.name" value="jMemorizePlus1" />
-    <property name="project.version" value="v0.1.0alpha" />
     <property name="project.file" value="${project.name}-${project.version}" />
 
     <path id="project.class.path">

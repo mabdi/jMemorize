@@ -244,9 +244,14 @@ public class CardTable extends JTable implements Settings.CardFontObserver, Sele
 		}
 
 		public void setCards(List<Card> cards, Category category) {
+			setCards(cards, category, true);
+		}
+
+		public void setCards(List<Card> cards, Category category, boolean sort) {
 			m_cards = cards;
 			m_category = category;
-			resort();
+			if (sort)
+				resort();
 
 			updateCardCountStatusBar();
 		}
