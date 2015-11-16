@@ -24,34 +24,32 @@ import java.awt.event.KeyEvent;
 import jmemorize.core.Main;
 import jmemorize.gui.Localization;
 import jmemorize.gui.swing.actions.AbstractSessionDisabledAction;
+import jmemorize.gui.swing.dialogs.DropboxPushDialog;
 
 /**
  * An action that opens up a file chooser and saves the lesson at that location.
  * 
  * @author djemili
  */
-public class DropboxSyncAction extends AbstractSessionDisabledAction
-{
-    public DropboxSyncAction()
-    {
-        setValues();
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener
-     */
-    public void actionPerformed(java.awt.event.ActionEvent e)
-    {
-        Main main = Main.getInstance();
-        main.getFrame().openSyncDialog();
-    }
-    
-    private void setValues()
-    {
-        setName(Localization.get("MainFrame.SYNC")); //$NON-NLS-1$
-        setDescription(Localization.get("MainFrame.SYNC_DESC")); //$NON-NLS-1$
-        setIcon("/resource/icons/Dropbox-icon.png"); //$NON-NLS-1$
-        setAccelerator(KeyEvent.VK_Y, SHORTCUT_KEY + InputEvent.SHIFT_MASK);
-        setMnemonic(2);
-    }
+public class DropboxSyncAction extends AbstractSessionDisabledAction {
+	public DropboxSyncAction() {
+		setValues();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.ActionListener
+	 */
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+		new DropboxPushDialog(Main.getInstance().getFrame());
+	}
+
+	private void setValues() {
+		setName(Localization.get("MainFrame.SYNC")); //$NON-NLS-1$
+		setDescription(Localization.get("MainFrame.SYNC_DESC")); //$NON-NLS-1$
+		setIcon("/resource/icons/Dropbox-icon.png"); //$NON-NLS-1$
+		setAccelerator(KeyEvent.VK_Y, SHORTCUT_KEY + InputEvent.SHIFT_MASK);
+		setMnemonic(2);
+	}
 }

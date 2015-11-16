@@ -250,9 +250,12 @@ public class CardTable extends JTable implements Settings.CardFontObserver, Sele
 		public void setCards(List<Card> cards, Category category, boolean sort) {
 			m_cards = cards;
 			m_category = category;
+			
 			if (sort)
 				resort();
-
+			else
+				fireTableDataChanged();
+			
 			updateCardCountStatusBar();
 		}
 

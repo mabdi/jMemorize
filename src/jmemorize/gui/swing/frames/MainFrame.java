@@ -503,17 +503,7 @@ public class MainFrame extends JFrame implements CategoryObserver,
         }
     }
 
-    /**
-     * Saves the lesson or displays an error message if the operation failed.
-     * 
-     * @param file The path to the lesson. If <code>null</code> a file chooser
-     * is shown that allows the user to select the file.
-     */
-    public void openSyncDialog()
-    {
-        DropboxPushDialog dialg = new DropboxPushDialog(this);
-        dialg.setVisible(true);
-    }
+    
     
     /**
      * If lesson was modified this shows a dialog that asks if the user wants to
