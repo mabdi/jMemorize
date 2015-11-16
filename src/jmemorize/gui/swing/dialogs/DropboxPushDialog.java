@@ -5,8 +5,6 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -71,9 +69,15 @@ public class DropboxPushDialog extends JDialog {
 	private JTable dataTable;
 	private DefaultTableModel tableModel;
 	private CardLayout layout;
+	private JButton btnCancel;
+	private JButton btnRefresh;
+	protected DbxWebAuthNoRedirect webAuth;
+	private CardLayout layTopPanel;
+	private JLabel lblTop;
 
 	public DropboxPushDialog(JFrame parent) {
 		super(parent, "Sync With Dropbox", true);
+		setIconImage(new ImageIcon(getClass().getResource("/resource/icons/Dropbox-icon.png")).getImage());
 		BufferedReader in = null;
 		List<String> lines = new ArrayList<>();
 		try {
@@ -103,7 +107,6 @@ public class DropboxPushDialog extends JDialog {
 			@Override
 			public void run() {
 				updatePanel();
-				layout.show(getContentPane(), "main");
 			}
 		});
 		setLocationRelativeTo(parent);
@@ -111,11 +114,19 @@ public class DropboxPushDialog extends JDialog {
 	}
 
 	private void updatePanel() {
+		lock(true);
+		if (accessToken.length() == 0) {
+			updateUserInfoPanel();
+			lock(false);
+			return;
+		}
+
 		DbxEntry.WithChildren listing;
 		try {
 			client = new DbxClient(config, accessToken);
-			updateUserInfoPanel();
 			listing = client.getMetadataWithChildren("/");
+			updateUserInfoPanel();
+			getTableModel().setRowCount(0);
 			for (DbxEntry child : listing.children) {
 				if (child.isFile() && child.asFile().name.toLowerCase().endsWith(".jml")) {
 					getTableModel().addRow(new String[] { child.asFile().name, child.asFile().humanSize,
@@ -126,6 +137,7 @@ public class DropboxPushDialog extends JDialog {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		lock(false);
 
 	}
 
@@ -134,6 +146,8 @@ public class DropboxPushDialog extends JDialog {
 		getContentPane().setLayout(layout);
 		add("main", getMainPanel());
 		add("loading", getLoadingPanel());
+		validate();
+		repaint();
 	}
 
 	private JPanel getLoadingPanel() {
@@ -141,9 +155,10 @@ public class DropboxPushDialog extends JDialog {
 		loading.setLayout(new BorderLayout());
 		// Icon from
 		// http://www.ajaxload.info/
-		ImageIcon icon = new ImageIcon(getClass().getResource("/resource/icons/ajax-loader.gif"));
-		JLabel lbl = new JLabel("Please Wait!", icon, JLabel.CENTER);
-		// lbl.setIcon();
+		// ImageIcon icon = new
+		// ImageIcon(getClass().getResource("/resource/icons/spinner.gif"));
+		JLabel lbl = new JLabel("Loading ...");
+		lbl.setHorizontalAlignment(JLabel.CENTER);
 		loading.add(lbl, BorderLayout.CENTER);
 		return loading;
 	}
@@ -160,9 +175,46 @@ public class DropboxPushDialog extends JDialog {
 	private Component getButtonsPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER));
-		panel.add(getPull());
-		panel.add(getPush());
+		panel.add(getSave());
+		panel.add(getLoad());
+		panel.add(new JLabel("   "));
+		panel.add(getRefresh());
+		panel.add(getCancel());
+
 		return panel;
+	}
+
+	private JButton getCancel() {
+		if (btnCancel == null) {
+			btnCancel = new JButton("Cancel");
+			btnCancel.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					dispose();
+				}
+			});
+		}
+		return btnCancel;
+	}
+
+	private JButton getRefresh() {
+		if (btnRefresh == null) {
+			btnRefresh = new JButton("Refresh");
+			btnRefresh.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							updatePanel();
+						}
+					});
+				}
+			});
+		}
+		return btnRefresh;
 	}
 
 	private JPanel getFilesListPanel() {
@@ -194,44 +246,47 @@ public class DropboxPushDialog extends JDialog {
 	private Component getUserInfoPanel() {
 		if (topPanel == null) {
 			topPanel = new JPanel();
-			topPanel.setLayout(new GridBagLayout());
-			topPanel.add(new JLabel("Loading .. "));
+			layTopPanel = new CardLayout();
+			topPanel.setLayout(layTopPanel);
+
+			JPanel p0 = new JPanel();
+			p0.add(new JLabel("Loading .. "));
+
+			JPanel p1 = new JPanel();
+			p1.setLayout(new BorderLayout());
+			p1.add(getNewUser(), BorderLayout.WEST);
+			p1.add(getTokenTextBox(), BorderLayout.CENTER);
+			p1.add(getSignInButton(), BorderLayout.EAST);
+
+			JPanel p2 = new JPanel();
+			lblTop = new JLabel("Try again");
+			lblTop.setHorizontalTextPosition(JLabel.LEFT);
+			topPanel.add(lblTop, BorderLayout.CENTER);
+			topPanel.add(getSignOutButton(), BorderLayout.EAST);
+
+			topPanel.add("p0", p0);
+			topPanel.add("p1", p1);
+			topPanel.add("p2", p2);
 		}
 		return topPanel;
 	}
 
 	private void updateUserInfoPanel() {
-		topPanel.removeAll();
 		if (accessToken.isEmpty()) {
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.weightx = 0;
-			topPanel.add(getNewUser(), gbc);
-			gbc.weightx = 1;
-			gbc.gridx = 1;
-			topPanel.add(getTokenTextBox(), gbc);
-			gbc.weightx = 0;
-			gbc.gridx = 2;
-			topPanel.add(getSignInButton(), gbc);
+			layTopPanel.show(topPanel, "p1");
 		} else {
 			String s = getInfo();
-			boolean faied = false;
 			if (s.isEmpty()) {
-				s = "Connection Failed. click to retry.";
-				faied = true;
+				s = "Connection Failed.";
+				lblTop.setText(s);
+				getSignOutButton().setEnabled(false);
+			}else{
+				lblTop.setText(s);
+				getSignOutButton().setEnabled(true);
 			}
-			GridBagConstraints gbc = new GridBagConstraints();
-			gbc.gridx = 0;
-			gbc.gridy = 0;
-			gbc.weightx = 1;
-			topPanel.add(new JLabel(s), gbc);
-			if (!faied) {
-				gbc.weightx = 0;
-				gbc.gridx++;
-				topPanel.add(getSignOutButton(), gbc);
-			}
+			layTopPanel.show(topPanel, "p2");
 		}
+//		topPanel.invalidate();
 	}
 
 	private JTextField getTokenTextBox() {
@@ -248,6 +303,21 @@ public class DropboxPushDialog extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (webAuth == null) {
+						return;
+					}
+					String code = getTokenTextBox().getText().trim();
+					if (code != null && !code.isEmpty()) {
+						try {
+							DbxAuthFinish authFinish = webAuth.finish(code);
+							accessToken = authFinish.accessToken;
+							Main.USER_PREFS.put(PREFS_DROPBOX_TOKEN, accessToken);
+							updateUserInfoPanel();
+						} catch (DbxException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
 
 				}
 			});
@@ -263,6 +333,7 @@ public class DropboxPushDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					accessToken = "";
+					Main.USER_PREFS.put(PREFS_DROPBOX_TOKEN, accessToken);
 					updateUserInfoPanel();
 				}
 			});
@@ -271,54 +342,85 @@ public class DropboxPushDialog extends JDialog {
 	}
 
 	private void lock(boolean f) {
-		getNewUser().setEnabled(f);
-		getPull().setEnabled(f);
-		getPush().setEnabled(f);
+		if (f) {
+			layout.show(getContentPane(), "loading");
+		} else {
+			layout.show(getContentPane(), "main");
+		}
 	}
 
-	private JButton getPull() {
+	private JButton getSave() {
 		if (btnPull == null) {
-			btnPull = new JButton("Pull");
+			btnPull = new JButton("Save to Dropbox");
 			btnPull.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (Main.getInstance().getLesson() == null) {
+						JOptionPane.showMessageDialog(DropboxPushDialog.this, "No Lesson is loaded.");
+						return;
+					}
 					if (client == null) {
 						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Use recent token or do a login first.");
 						return;
 					}
-					FileOutputStream outputStream = null;
-					try {
-						lock(false);
-
+					if (Main.getInstance().getLesson().canSave() && Main.getInstance().getLesson().getFile() == null) {
 						String filename = JOptionPane.showInputDialog(DropboxPushDialog.this, "Enter File Name:");
+						if (filename.isEmpty()) {
+							filename = "noname.jml";
+						}
 						File home = new File(System.getProperty("user.home") + "/jMemorize+1");
 						if (!home.exists())
 							home.mkdir();
 						File temp = new File(home, filename);
-						outputStream = new FileOutputStream(temp);
-						DbxEntry.File downloadedFile = client.getFile("/" + filename, null, outputStream);
-						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Metadata: " + downloadedFile.toString());
-						outputStream.flush();
-						outputStream.close();
-						Main.getInstance().getFrame().loadLesson(temp);
-					} catch (DbxException e0) {
-						e0.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} finally {
-						lock(true);
+						try {
+							Main.getInstance().saveLesson(Main.getInstance().getLesson(), temp);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 					}
+
+					lock(false);
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							doUpload();
+							dispose();
+						}
+					});
 				}
 			});
 		}
 		return btnPull;
 	}
 
-	private JButton getPush() {
+	private void doUpload() {
+		lock(false);
+		File inputFile = Main.getInstance().getLesson().getFile();
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(inputFile);
+			DbxEntry.File uploadedFile = client.uploadFile("/" + inputFile.getName(), DbxWriteMode.force(),
+					inputFile.length(), inputStream);
+			// JOptionPane.showMessageDialog(DropboxPushDialog.this, "Uploaded:
+			// " + uploadedFile.toString());
+
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			try {
+				if (inputStream != null)
+					inputStream.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			lock(true);
+		}
+	}
+
+	private JButton getLoad() {
 		if (btnPush == null) {
-			btnPush = new JButton("Push");
+			btnPush = new JButton("Load from Dropbox");
 			btnPush.addActionListener(new ActionListener() {
 
 				@Override
@@ -327,36 +429,53 @@ public class DropboxPushDialog extends JDialog {
 						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Use recent token or do a login first.");
 						return;
 					}
-					if (Main.getInstance().getLesson() == null) {
-						JOptionPane.showMessageDialog(DropboxPushDialog.this, "No Lesson is loaded.");
+					if (getDataTable().getSelectedRow() < 0) {
+						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Select a file from table.");
 						return;
 					}
 
-					File inputFile = Main.getInstance().getLesson().getFile();
-					FileInputStream inputStream = null;
-					try {
-						lock(false);
-						inputStream = new FileInputStream(inputFile);
-						DbxEntry.File uploadedFile = client.uploadFile("/" + inputFile.getName(),
-								DbxWriteMode.update(System.currentTimeMillis() + ""), inputFile.length(), inputStream);
-						JOptionPane.showMessageDialog(DropboxPushDialog.this, "Uploaded: " + uploadedFile.toString());
-
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					} finally {
-						try {
-							if (inputStream != null)
-								inputStream.close();
-						} catch (IOException e1) {
-							e1.printStackTrace();
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							doDownload();
+							dispose();
 						}
-						lock(true);
-					}
+					});
 
 				}
 			});
 		}
 		return btnPush;
+	}
+
+	private void doDownload() {
+		FileOutputStream outputStream = null;
+		try {
+			String filename = "";
+			if (getDataTable().getSelectedRow() >= 0) {
+				filename = getTableModel().getValueAt(getDataTable().getSelectedRow(), 0).toString();
+			}
+			if (filename.isEmpty()) {
+				filename = "noname.jml";
+			}
+			File home = new File(System.getProperty("user.home") + "/jMemorize+1");
+			if (!home.exists())
+				home.mkdir();
+			File temp = new File(home, filename);
+			outputStream = new FileOutputStream(temp);
+			DbxEntry.File downloadedFile = client.getFile("/" + filename, null, outputStream);
+			// JOptionPane.showMessageDialog(DropboxPushDialog.this, "Metadata:
+			// " + downloadedFile.toString());
+			outputStream.flush();
+			outputStream.close();
+			Main.getInstance().getFrame().loadLesson(temp);
+		} catch (DbxException e0) {
+			e0.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			lock(true);
+		}
 	}
 
 	private JButton getNewUser() {
@@ -366,7 +485,7 @@ public class DropboxPushDialog extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
+					webAuth = new DbxWebAuthNoRedirect(config, appInfo);
 					String authorizeUrl = webAuth.start();
 					if (Desktop.isDesktopSupported()) {
 						try {
@@ -379,18 +498,9 @@ public class DropboxPushDialog extends JDialog {
 							e1.printStackTrace();
 						}
 					}
-					String code = JOptionPane.showInputDialog("Please enter the authorization code: ");
-					if (code != null && !code.isEmpty()) {
-						try {
-							DbxAuthFinish authFinish = webAuth.finish(code);
-							accessToken = authFinish.accessToken;
-							Main.USER_PREFS.put(PREFS_DROPBOX_TOKEN, accessToken);
-							getInfo();
-						} catch (DbxException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
+					// String code = JOptionPane.showInputDialog("Please enter
+					// the authorization code: ");
+
 				}
 			});
 		}
@@ -400,7 +510,7 @@ public class DropboxPushDialog extends JDialog {
 	protected String getInfo() {
 		try {
 			return "Linked account: " + client.getAccountInfo().displayName;
-		} catch (DbxException e) {
+		} catch (Exception e) {
 			return "";
 		}
 	}
