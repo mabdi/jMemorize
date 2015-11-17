@@ -83,6 +83,7 @@ import jmemorize.gui.swing.actions.edit.FindAction;
 import jmemorize.gui.swing.actions.edit.RemoveAction;
 import jmemorize.gui.swing.actions.edit.ResetCardAction;
 import jmemorize.gui.swing.actions.file.AbstractExportAction;
+import jmemorize.gui.swing.actions.file.DropboxSyncAction;
 import jmemorize.gui.swing.actions.file.ExitAction;
 import jmemorize.gui.swing.actions.file.NewLessonAction;
 import jmemorize.gui.swing.actions.file.OpenLessonAction;
@@ -783,6 +784,7 @@ public class MainFrame extends JFrame implements CategoryObserver,
         operationsToolbar.add(new JButton(new NewLessonAction()));
         operationsToolbar.add(new JButton(new OpenLessonAction()));
         operationsToolbar.add(new JButton(new SaveLessonAction()));
+        operationsToolbar.add(new JButton(new DropboxSyncAction()));
         
         operationsToolbar.add(new JButton(new AddCardAction(this)));
         operationsToolbar.add(new JButton(new EditCardAction(this)));

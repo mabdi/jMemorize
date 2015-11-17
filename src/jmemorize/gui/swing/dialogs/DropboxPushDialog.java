@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
@@ -115,6 +116,16 @@ public class DropboxPushDialog extends JDialog {
 
 	private void updatePanel() {
 		lock(true);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updatePanel_internal();
+				lock(false);
+			}
+		});
+	}
+
+	private void updatePanel_internal() {
 		if (accessToken.length() == 0) {
 			updateUserInfoPanel();
 			lock(false);
@@ -124,8 +135,8 @@ public class DropboxPushDialog extends JDialog {
 		DbxEntry.WithChildren listing;
 		try {
 			client = new DbxClient(config, accessToken);
-			listing = client.getMetadataWithChildren("/");
 			updateUserInfoPanel();
+			listing = client.getMetadataWithChildren("/");
 			getTableModel().setRowCount(0);
 			for (DbxEntry child : listing.children) {
 				if (child.isFile() && child.asFile().name.toLowerCase().endsWith(".jml")) {
@@ -137,8 +148,6 @@ public class DropboxPushDialog extends JDialog {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		lock(false);
-
 	}
 
 	private void initComponents() {
@@ -249,8 +258,8 @@ public class DropboxPushDialog extends JDialog {
 			layTopPanel = new CardLayout();
 			topPanel.setLayout(layTopPanel);
 
-			JPanel p0 = new JPanel();
-			p0.add(new JLabel("Loading .. "));
+//			JPanel p0 = new JPanel();
+//			p0.add(new JLabel("Loading .. "));
 
 			JPanel p1 = new JPanel();
 			p1.setLayout(new BorderLayout());
@@ -259,12 +268,13 @@ public class DropboxPushDialog extends JDialog {
 			p1.add(getSignInButton(), BorderLayout.EAST);
 
 			JPanel p2 = new JPanel();
+			p2.setLayout(new BorderLayout());
 			lblTop = new JLabel("Try again");
-			lblTop.setHorizontalTextPosition(JLabel.LEFT);
-			topPanel.add(lblTop, BorderLayout.CENTER);
-			topPanel.add(getSignOutButton(), BorderLayout.EAST);
+			lblTop.setHorizontalAlignment(SwingConstants.LEFT);
+			p2.add(lblTop, BorderLayout.CENTER);
+			p2.add(getSignOutButton(), BorderLayout.EAST);
 
-			topPanel.add("p0", p0);
+//			topPanel.add("p0", p0);
 			topPanel.add("p1", p1);
 			topPanel.add("p2", p2);
 		}
@@ -275,18 +285,19 @@ public class DropboxPushDialog extends JDialog {
 		if (accessToken.isEmpty()) {
 			layTopPanel.show(topPanel, "p1");
 		} else {
+			layTopPanel.show(topPanel, "p2");
 			String s = getInfo();
 			if (s.isEmpty()) {
 				s = "Connection Failed.";
 				lblTop.setText(s);
 				getSignOutButton().setEnabled(false);
-			}else{
+			} else {
 				lblTop.setText(s);
 				getSignOutButton().setEnabled(true);
 			}
-			layTopPanel.show(topPanel, "p2");
 		}
-//		topPanel.invalidate();
+		validate();
+		repaint();
 	}
 
 	private JTextField getTokenTextBox() {
@@ -314,7 +325,6 @@ public class DropboxPushDialog extends JDialog {
 							Main.USER_PREFS.put(PREFS_DROPBOX_TOKEN, accessToken);
 							updateUserInfoPanel();
 						} catch (DbxException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
@@ -400,10 +410,7 @@ public class DropboxPushDialog extends JDialog {
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(inputFile);
-			DbxEntry.File uploadedFile = client.uploadFile("/" + inputFile.getName(), DbxWriteMode.force(),
-					inputFile.length(), inputStream);
-			// JOptionPane.showMessageDialog(DropboxPushDialog.this, "Uploaded:
-			// " + uploadedFile.toString());
+			client.uploadFile("/" + inputFile.getName(), DbxWriteMode.force(), inputFile.length(), inputStream);
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -463,9 +470,7 @@ public class DropboxPushDialog extends JDialog {
 				home.mkdir();
 			File temp = new File(home, filename);
 			outputStream = new FileOutputStream(temp);
-			DbxEntry.File downloadedFile = client.getFile("/" + filename, null, outputStream);
-			// JOptionPane.showMessageDialog(DropboxPushDialog.this, "Metadata:
-			// " + downloadedFile.toString());
+			client.getFile("/" + filename, null, outputStream);
 			outputStream.flush();
 			outputStream.close();
 			Main.getInstance().getFrame().loadLesson(temp);
@@ -491,16 +496,11 @@ public class DropboxPushDialog extends JDialog {
 						try {
 							Desktop.getDesktop().browse(new URI(authorizeUrl));
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						} catch (URISyntaxException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
-					// String code = JOptionPane.showInputDialog("Please enter
-					// the authorization code: ");
-
 				}
 			});
 		}
