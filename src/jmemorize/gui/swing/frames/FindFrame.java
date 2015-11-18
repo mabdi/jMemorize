@@ -28,33 +28,47 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.text.DefaultEditorKit;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.factories.ButtonBarFactory;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 import jmemorize.core.Card;
 import jmemorize.core.Category;
 import jmemorize.core.CategoryObserver;
 import jmemorize.core.Events;
 import jmemorize.core.Main;
+import jmemorize.core.Main.ProgramEndObserver;
 import jmemorize.core.SearchTool;
 import jmemorize.core.Settings;
-import jmemorize.core.Main.ProgramEndObserver;
 import jmemorize.gui.LC;
 import jmemorize.gui.Localization;
 import jmemorize.gui.swing.actions.AbstractAction2;
@@ -64,386 +78,350 @@ import jmemorize.gui.swing.widgets.CategoryComboBox;
 import jmemorize.util.EscapableFrame;
 import jmemorize.util.RecentItems;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.factories.ButtonBarFactory;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * A frame that shows search options and a card table as results view.
  * 
  * @author djemili
  */
-public class FindFrame extends EscapableFrame 
-    implements CategoryObserver, ProgramEndObserver
-{
-    private final static String FRAME_ID            = "findframe";
+public class FindFrame extends EscapableFrame implements CategoryObserver, ProgramEndObserver {
+	private final static String FRAME_ID = "findframe";
 
-    private CardTable           m_cardTable         = new CardTable(this, 
-        Main.USER_PREFS.node("find.table"), //$NON-NLS-1$
-            new int[] {
-                CardTable.COLUMN_FRONTSIDE, 
-                CardTable.COLUMN_BACKSIDE, 
-                CardTable.COLUMN_CATEGORY });
+	private CardTable m_cardTable = new CardTable(this, Main.USER_PREFS.node("find.table"), //$NON-NLS-1$
+			new int[] { CardTable.COLUMN_FRONTSIDE, CardTable.COLUMN_BACKSIDE, CardTable.COLUMN_CATEGORY });
 
-    // swing widgets
-    private JComboBox           m_searchTextBox     = new JComboBox();
-    private RecentItems         m_recentSearchTexts = new RecentItems(10, 
-        Main.USER_PREFS.node("recent.search.texts"));               //$NON-NLS-1$
+	// swing widgets
+	private JComboBox m_searchTextBox = new JComboBox();
+	private RecentItems m_recentSearchTexts = new RecentItems(10, Main.USER_PREFS.node("recent.search.texts")); //$NON-NLS-1$
 
-    private JCheckBox           m_matchCaseBox      = new JCheckBox(
-        Localization.get(LC.MATCH_CASE));
-    private JRadioButton        m_radioBothSides    = new JRadioButton(
-        Localization.get(LC.BOTH_SIDES), true);
-    private JRadioButton        m_radioFrontSide    = new JRadioButton(
-        Localization.get(LC.FRONTSIDE));
-    private JRadioButton        m_radioBackSide     = new JRadioButton(
-        Localization.get(LC.FLIPSIDE));
-    
-    private CategoryComboBox    m_categoryBox       = new CategoryComboBox();
-    private StatusBar           m_statusBar         = new StatusBar();
+	private JCheckBox m_matchCaseBox = new JCheckBox(Localization.get(LC.MATCH_CASE));
+	private JRadioButton m_radioBothSides = new JRadioButton(Localization.get(LC.BOTH_SIDES), true);
+	private JRadioButton m_radioFrontSide = new JRadioButton(Localization.get(LC.FRONTSIDE));
+	private JRadioButton m_radioBackSide = new JRadioButton(Localization.get(LC.FLIPSIDE));
 
-    // these vars are stored when search button is clicked
-    private String              m_searchText;
-    private int                 m_searchSides;
-    private boolean             m_matchCase;
-    private Category            m_searchCategory;
-    
-    private static FindFrame    m_instance;
+	private CategoryComboBox m_categoryBox = new CategoryComboBox();
+	private StatusBar m_statusBar = new StatusBar();
 
-    private class FindAction extends AbstractAction2
-    {
-        public FindAction()
-        {
-            setName(Localization.get("FindTool.FIND")); //$NON-NLS-1$
-        }
+	// these vars are stored when search button is clicked
+	private String m_searchText;
+	private int m_searchSides;
+	private boolean m_matchCase;
+	private Category m_searchCategory;
 
-        public void actionPerformed(java.awt.event.ActionEvent e)
-        {
-            search();
-        }
-    }
+	private JPopupMenu m_popupMenu;
 
-    private class CloseAction extends AbstractAction2
-    {
-        public CloseAction()
-        {
-            setName(Localization.get(LC.CANCEL));
-        }
+	private static FindFrame m_instance;
 
-        public void actionPerformed(java.awt.event.ActionEvent e)
-        {
-            close();
-        }
-    }
+	private class FindAction extends AbstractAction2 {
+		public FindAction() {
+			setName(Localization.get("FindTool.FIND")); //$NON-NLS-1$
+		}
 
-    public static FindFrame getInstance()
-    {
-        if (m_instance == null)
-        {
-            m_instance = new FindFrame();
-        }
-        
-        return m_instance;
-    }
-    
-    public void show(Category rootCategory, Category selectedCategory)
-    {
-        if (rootCategory != m_categoryBox.getRootCategory())
-        {
-            clear();
-        }
-        
-        m_categoryBox.setRootCategory(rootCategory);
-        m_categoryBox.setSelectedCategory(selectedCategory);
-        m_searchTextBox.requestFocus();
-        setVisible(true);
-    }
-    
-    /**
-     * Remove all search results.
-     */
-    public void clear()
-    {
-        Category selectedCategory = m_categoryBox.getSelectedCategory();
-        m_cardTable.getView().setCards(new ArrayList<Card>(0), selectedCategory);
-    }
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			search();
+		}
+	}
 
-    public void search()
-    {
-        String searchText = (String)m_searchTextBox.getSelectedItem();
+	private class CloseAction extends AbstractAction2 {
+		public CloseAction() {
+			setName(Localization.get(LC.CANCEL));
+		}
 
-        if (searchText == null || searchText.equals("")) //$NON-NLS-1$
-            return;
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+			close();
+		}
+	}
 
-        m_searchText = searchText;
-        m_recentSearchTexts.push(m_searchText);
+	public static FindFrame getInstance() {
+		if (m_instance == null) {
+			m_instance = new FindFrame();
+		}
 
-        if (m_radioBothSides.isSelected())
-        {
-            m_searchSides = SearchTool.BOTH_SIDES;
-        } 
-        else
-        {
-            m_searchSides = m_radioFrontSide.isSelected() ? 
-                SearchTool.FRONT_SIDE : SearchTool.FLIP_SIDE;
-        }
+		return m_instance;
+	}
 
-        if (m_searchCategory != null)
-        {
-            m_searchCategory.removeObserver(FindFrame.this);
-        }
-        m_searchCategory = m_categoryBox.getSelectedCategory();
-        m_searchCategory.addObserver(FindFrame.this);
+	public void show(Category rootCategory, Category selectedCategory) {
+		if (rootCategory != m_categoryBox.getRootCategory()) {
+			clear();
+		}
 
-        m_matchCase = m_matchCaseBox.isSelected();
+		m_categoryBox.setRootCategory(rootCategory);
+		m_categoryBox.setSelectedCategory(selectedCategory);
+		m_searchTextBox.requestFocus();
+		setVisible(true);
+	}
 
-        List<Card> results = SearchTool.search(m_searchText, m_searchSides, 
-            m_matchCase, m_searchCategory.getCards());
-        
-        m_cardTable.getView().setCards(results, m_searchCategory);
-    }
+	/**
+	 * Remove all search results.
+	 */
+	public void clear() {
+		Category selectedCategory = m_categoryBox.getSelectedCategory();
+		m_cardTable.getView().setCards(new ArrayList<Card>(0), selectedCategory);
+	}
 
-    public boolean close()
-    {
-        setVisible(false);
-        return true;
-    }
+	public void search() {
+		String searchText = (String) m_searchTextBox.getSelectedItem();
 
-    /*
-     * @see jmemorize.core.CategoryObserver#onCardEvent
-     */
-    public void onCardEvent(int type, Card card, Category category, int deck)
-    {
-        // CHECK move into cardtable!?
-        List<Card> cards = m_cardTable.getView().getCards();
+		if (searchText == null || searchText.equals("")) //$NON-NLS-1$
+			return;
 
-        // for now we only remove cards but dont add new cards
-        if (type == Events.REMOVED_EVENT)
-        {
-            cards.remove(card);
-        }
+		m_searchText = searchText;
+		m_recentSearchTexts.push(m_searchText);
 
-        m_cardTable.getView().setCards(cards, m_searchCategory);
-        updateStatusBar();
-    }
+		if (m_radioBothSides.isSelected()) {
+			m_searchSides = SearchTool.BOTH_SIDES;
+		} else {
+			m_searchSides = m_radioFrontSide.isSelected() ? SearchTool.FRONT_SIDE : SearchTool.FLIP_SIDE;
+		}
 
-    /*
-     * @see jmemorize.core.CategoryObserver#onCategoryEvent
-     */
-    public void onCategoryEvent(int type, Category category)
-    {
-        // category combo box handles this event by itself
-    }
+		if (m_searchCategory != null) {
+			m_searchCategory.removeObserver(FindFrame.this);
+		}
+		m_searchCategory = m_categoryBox.getSelectedCategory();
+		m_searchCategory.addObserver(FindFrame.this);
 
-    public CardTable getCardTable()
-    {
-        return m_cardTable;
-    }
+		m_matchCase = m_matchCaseBox.isSelected();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jmemorize.core.Main.ProgramEndObserver
-     */
-    public void onProgramEnd()
-    {
-        Settings.storeFrameState(this, FRAME_ID);
-    }
+		List<Card> results = SearchTool.search(m_searchText, m_searchSides, m_matchCase, m_searchCategory.getCards());
 
-    private void updateStatusBar()
-    {
-        m_statusBar.setCards(m_cardTable.getView().getCards());
-    }
+		m_cardTable.getView().setCards(results, m_searchCategory);
+	}
 
-    private JPanel buildSearchPanel()
-    {
-        setupSearchTextBox();
+	public boolean close() {
+		setVisible(false);
+		return true;
+	}
 
-        JScrollPane scrollPane = new JScrollPane(m_cardTable);
-        Color color = UIManager.getColor("Table.background"); //$NON-NLS-1$
-        scrollPane.getViewport().setBackground(color);
-        scrollPane.setPreferredSize(new Dimension(500, 200));
+	/*
+	 * @see jmemorize.core.CategoryObserver#onCardEvent
+	 */
+	public void onCardEvent(int type, Card card, Category category, int deck) {
+		// CHECK move into cardtable!?
+		List<Card> cards = m_cardTable.getView().getCards();
 
-        FormLayout layout = new FormLayout(
-            "right:pref, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow", // columns // //$NON-NLS-1$
-            "p, 3dlu, p, 3dlu, p, 3dlu, p, 9dlu, p, 9dlu, fill:d:grow"); // rows // //$NON-NLS-1$
+		// for now we only remove cards but dont add new cards
+		if (type == Events.REMOVED_EVENT) {
+			cards.remove(card);
+		}
 
-        CellConstraints cc = new CellConstraints();
+		m_cardTable.getView().setCards(cards, m_searchCategory);
+		updateStatusBar();
+	}
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(layout);
-        builder.setDefaultDialogBorder();
+	/*
+	 * @see jmemorize.core.CategoryObserver#onCategoryEvent
+	 */
+	public void onCategoryEvent(int type, Category category) {
+		// category combo box handles this event by itself
+	}
 
-        builder.addLabel(Localization.get("FindTool.SEARCH_TEXT"), cc.xy(1, 1)); //$NON-NLS-1$
-        builder.add(m_searchTextBox, cc.xyw(3, 1, 5));
+	public CardTable getCardTable() {
+		return m_cardTable;
+	}
 
-        builder.addLabel(Localization.get("General.CATEGORY"), cc.xy(1, 3)); //$NON-NLS-1$
-        builder.add(m_categoryBox, cc.xyw(3, 3, 5));
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see jmemorize.core.Main.ProgramEndObserver
+	 */
+	public void onProgramEnd() {
+		Settings.storeFrameState(this, FRAME_ID);
+	}
 
-        builder.addLabel(Localization.get("FindTool.SETTINGS"), cc.xy(1, 5)); //$NON-NLS-1$
-        builder.add(m_radioBothSides, cc.xy(3, 5));
-        builder.add(m_radioFrontSide, cc.xy(5, 5));
-        builder.add(m_radioBackSide, cc.xy(7, 5));
+	private void updateStatusBar() {
+		m_statusBar.setCards(m_cardTable.getView().getCards());
+	}
 
-        builder.add(m_matchCaseBox, cc.xyw(3, 7, 5));
+	private JPanel buildSearchPanel() {
+		setupSearchTextBox();
 
-        builder.addSeparator(Localization.get("FindTool.RESULTS"), cc.xyw(1, 9, 7)); //$NON-NLS-1$
-        builder.add(scrollPane, cc.xyw(1, 11, 7));
+		JScrollPane scrollPane = new JScrollPane(m_cardTable);
+		Color color = UIManager.getColor("Table.background"); //$NON-NLS-1$
+		scrollPane.getViewport().setBackground(color);
+		scrollPane.setPreferredSize(new Dimension(500, 200));
 
-        return builder.getPanel();
-    }
+		FormLayout layout = new FormLayout("right:pref, 3dlu, pref:grow, 3dlu, pref:grow, 3dlu, pref:grow", // columns //$NON-NLS-1$
+																											// //
+				"p, 3dlu, p, 3dlu, p, 3dlu, p, 9dlu, p, 9dlu, fill:d:grow"); // rows //$NON-NLS-1$
+																				// //
 
-    private void setupSearchTextBox()
-    {
-        m_searchTextBox.setEditable(true);
-        m_searchTextBox.setMaximumRowCount(10);
+		CellConstraints cc = new CellConstraints();
 
-        m_searchTextBox.addPopupMenuListener(new PopupMenuListener()
-        {
-            public void popupMenuCanceled(PopupMenuEvent arg0)
-            {
-                // ignore
-            }
+		DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+		builder.setDefaultDialogBorder();
 
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0)
-            {
-                // ignore
-            }
+		builder.addLabel(Localization.get("FindTool.SEARCH_TEXT"), cc.xy(1, 1)); //$NON-NLS-1$
+		builder.add(m_searchTextBox, cc.xyw(3, 1, 5));
 
-            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0)
-            {
-                m_searchTextBox.setModel(new DefaultComboBoxModel(
-                    m_recentSearchTexts.getItems().toArray()));
-            }
-        });
+		builder.addLabel(Localization.get("General.CATEGORY"), cc.xy(1, 3)); //$NON-NLS-1$
+		builder.add(m_categoryBox, cc.xyw(3, 3, 5));
 
-        Component comp = m_searchTextBox.getEditor().getEditorComponent();
-        comp.addKeyListener(new KeyListener()
-        {
-            public void keyPressed(KeyEvent e)
-            {
-            }
+		builder.addLabel(Localization.get("FindTool.SETTINGS"), cc.xy(1, 5)); //$NON-NLS-1$
+		builder.add(m_radioBothSides, cc.xy(3, 5));
+		builder.add(m_radioFrontSide, cc.xy(5, 5));
+		builder.add(m_radioBackSide, cc.xy(7, 5));
 
-            public void keyReleased(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                {
-                    search();
-                }
-            }
+		builder.add(m_matchCaseBox, cc.xyw(3, 7, 5));
 
-            public void keyTyped(KeyEvent e)
-            {
-            }
-        });
+		builder.addSeparator(Localization.get("FindTool.RESULTS"), cc.xyw(1, 9, 7)); //$NON-NLS-1$
+		builder.add(scrollPane, cc.xyw(1, 11, 7));
 
-        Component editorComp = m_searchTextBox.getEditor().getEditorComponent();
-        editorComp.addFocusListener(new FocusListener()
-        {
-            public void focusGained(FocusEvent e)
-            {
-                m_searchTextBox.getEditor().selectAll();
-            }
+		return builder.getPanel();
+	}
 
-            public void focusLost(FocusEvent e)
-            {
-                // ignore
-            }
-        });
-    }
+	private void setupSearchTextBox() {
+		m_searchTextBox.setEditable(true);
+		m_searchTextBox.setMaximumRowCount(10);
+		
+		m_searchTextBox.addPopupMenuListener(new PopupMenuListener() {
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// ignore
+			}
 
-    private JPanel buildSearchBar()
-    {
-        JButton closeButton = new JButton(new CloseAction());
-        JButton searchButton = new JButton(new FindAction());
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// ignore
+			}
 
-        JPanel buttonPanel = ButtonBarFactory.buildRightAlignedBar(
-            searchButton, closeButton);
-        buttonPanel.setBorder(new EmptyBorder(0, 5, 5, 10));
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				m_searchTextBox.setModel(new DefaultComboBoxModel(m_recentSearchTexts.getItems().toArray()));
+			}
+		});
 
-        getRootPane().setDefaultButton(searchButton);
+		Component comp = m_searchTextBox.getEditor().getEditorComponent();
+		comp.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+			}
 
-        return buttonPanel;
-    }
-    
-    private FindFrame()
-    {
-        initComponents();
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					search();
+				}
+			}
 
-        Main.getInstance().addProgramEndObserver(this);
-        Settings.loadFrameState(this, FRAME_ID);
-    }
+			public void keyTyped(KeyEvent e) {
+			}
+		});
 
-    private void initComponents()
-    {
-        setTitle(Localization.get("FindTool.FIND")); //$NON-NLS-1$
+		Component editorComp = m_searchTextBox.getEditor().getEditorComponent();
+		editorComp.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+				m_searchTextBox.getEditor().selectAll();
+			}
 
-        // build main panel
-        ButtonGroup group = new ButtonGroup();
-        group.add(m_radioBothSides);
-        group.add(m_radioFrontSide);
-        group.add(m_radioBackSide);
+			public void focusLost(FocusEvent e) {
+				// ignore
+			}
+		});
+		
+		m_searchTextBox.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					JComboBox textPane = (JComboBox) e.getSource();
+					textPane.requestFocus();
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(buildSearchPanel(), BorderLayout.CENTER);
-        mainPanel.add(buildSearchBar(), BorderLayout.SOUTH);
-        mainPanel.setBorder(new EtchedBorder());
+					m_popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
+	}
 
-        // set status bar
-        m_statusBar = new StatusBar();
-        m_cardTable.setStatusBar(m_statusBar);
+	private JPanel buildSearchBar() {
+		JButton closeButton = new JButton(new CloseAction());
+		JButton searchButton = new JButton(new FindAction());
 
-        getContentPane().add(mainPanel, BorderLayout.CENTER);
-        getContentPane().add(m_statusBar, BorderLayout.SOUTH);
+		JPanel buttonPanel = ButtonBarFactory.buildRightAlignedBar(searchButton, closeButton);
+		buttonPanel.setBorder(new EmptyBorder(0, 5, 5, 10));
 
-        setupCardTable();
+		getRootPane().setDefaultButton(searchButton);
 
-        setIconImage(Toolkit.getDefaultToolkit().getImage(
-            getClass().getResource("/resource/icons/find.gif"))); //$NON-NLS-1$
-        pack();
-    }
+		return buttonPanel;
+	}
 
-    private void setupCardTable()
-    {
-        // close window on ESC key
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-        m_cardTable.getInputMap().put(keyStroke, "Cancel"); //$NON-NLS-1$
-        m_cardTable.getActionMap().put("Cancel", new AbstractAction() { //$NON-NLS-1$
-            public void actionPerformed(ActionEvent e)
-            {
-                close();
-            }
-        });
+	private FindFrame() {
+		m_popupMenu = buildPopupMenu();
+		initComponents();
 
-        // overwrite moving to next row when pressing ENTER
-        keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        m_cardTable.getInputMap().put(keyStroke, "Edit"); //$NON-NLS-1$
-        m_cardTable.getActionMap().put("Edit", new AbstractAction() { //$NON-NLS-1$
-            public void actionPerformed(ActionEvent e)
-            {
-                editCards();
-            }
-        });
+		Main.getInstance().addProgramEndObserver(this);
+		Settings.loadFrameState(this, FRAME_ID);
+	}
 
-        m_cardTable.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
-                if (evt.getClickCount() == 2)
-                {
-                    editCards();
-                }
-            }
-        });
-    }
+	private void initComponents() {
+		setTitle(Localization.get("FindTool.FIND")); //$NON-NLS-1$
 
-    private void editCards()
-    {
-        Card card = (Card)m_cardTable.getSelectedCards().get(0);
-        List<Card> cards = m_cardTable.getView().getCards();
-        Category category = m_cardTable.getView().getCategory();
+		// build main panel
+		ButtonGroup group = new ButtonGroup();
+		group.add(m_radioBothSides);
+		group.add(m_radioFrontSide);
+		group.add(m_radioBackSide);
 
-        EditCardFrame.getInstance().showCard(card, cards, category, 
-            m_searchText, m_searchSides, m_matchCase);
-    }
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.add(buildSearchPanel(), BorderLayout.CENTER);
+		mainPanel.add(buildSearchBar(), BorderLayout.SOUTH);
+		mainPanel.setBorder(new EtchedBorder());
+
+		// set status bar
+		m_statusBar = new StatusBar();
+		m_cardTable.setStatusBar(m_statusBar);
+
+		getContentPane().add(mainPanel, BorderLayout.CENTER);
+		getContentPane().add(m_statusBar, BorderLayout.SOUTH);
+
+		setupCardTable();
+
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/resource/icons/find.gif"))); //$NON-NLS-1$
+		pack();
+	}
+
+	private void setupCardTable() {
+		// close window on ESC key
+		KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		m_cardTable.getInputMap().put(keyStroke, "Cancel"); //$NON-NLS-1$
+		m_cardTable.getActionMap().put("Cancel", new AbstractAction() { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				close();
+			}
+		});
+
+		// overwrite moving to next row when pressing ENTER
+		keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+		m_cardTable.getInputMap().put(keyStroke, "Edit"); //$NON-NLS-1$
+		m_cardTable.getActionMap().put("Edit", new AbstractAction() { //$NON-NLS-1$
+			public void actionPerformed(ActionEvent e) {
+				editCards();
+			}
+		});
+
+		m_cardTable.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				if (evt.getClickCount() == 2) {
+					editCards();
+				}
+			}
+		});
+	}
+
+	private void editCards() {
+		Card card = (Card) m_cardTable.getSelectedCards().get(0);
+		List<Card> cards = m_cardTable.getView().getCards();
+		Category category = m_cardTable.getView().getCategory();
+
+		EditCardFrame.getInstance().showCard(card, cards, category, m_searchText, m_searchSides, m_matchCase);
+	}
+
+	private JPopupMenu buildPopupMenu() {
+		JPopupMenu menu = new JPopupMenu();
+		menu.add(createMenuItem(new DefaultEditorKit.CopyAction(), Localization.get(LC.COPY), "edit_copy.gif"));
+
+		menu.add(createMenuItem(new DefaultEditorKit.CutAction(), Localization.get(LC.CUT), "edit_cut.gif"));
+
+		menu.add(createMenuItem(new DefaultEditorKit.PasteAction(), Localization.get(LC.PASTE), "edit_paste.gif"));
+
+		return menu;
+	}
+
+	private JMenuItem createMenuItem(Action action, String text, String icon) {
+		JMenuItem item = new JMenuItem(action);
+		item.setIcon(new ImageIcon(getClass().getResource("/resource/icons/" + icon)));
+		item.setText(text);
+		return item;
+	}
 }

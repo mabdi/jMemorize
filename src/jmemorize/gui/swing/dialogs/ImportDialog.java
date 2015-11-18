@@ -44,6 +44,7 @@ public class ImportDialog extends JDialog {
 			getListModel().addElement(element);
 		}
 		this.pack();
+		setLocationRelativeTo(parent);
 	}
 
 	public List<Card> getSelectedCards() {
