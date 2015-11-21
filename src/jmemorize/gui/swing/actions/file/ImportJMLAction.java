@@ -25,6 +25,7 @@ import java.util.List;
 import javax.swing.filechooser.FileFilter;
 
 import jmemorize.core.Card;
+import jmemorize.core.Category;
 import jmemorize.core.Lesson;
 import jmemorize.core.Main;
 import jmemorize.core.io.XmlBuilder;
@@ -53,9 +54,10 @@ public class ImportJMLAction extends AbstractImportAction {
 			// add all Selected Node to lesson
 			frame.setVisible(true);
 			List<Card> cards = frame.getSelectedCards();
+			Category cat = frame.getSelectedCat();
 			if (cards != null)
 				for (Card card : cards) {
-					lesson.getRootCategory().addCard(card);
+					cat.addCard(card);
 				}
 		} catch (Exception e) {
 			throw new IOException(e.getLocalizedMessage());

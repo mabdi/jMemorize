@@ -1,9 +1,8 @@
 package jmemorize.gui.swing.dialogs;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -12,17 +11,17 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 
 import jmemorize.core.Card;
+import jmemorize.core.Category;
 import jmemorize.core.Lesson;
-import jmemorize.gui.LC;
-import jmemorize.gui.Localization;
-import jmemorize.util.EscapableFrame;
+import jmemorize.core.Main;
+import jmemorize.gui.swing.widgets.CategoryComboBox;
 
 public class ImportDialog extends JDialog {
 
@@ -35,6 +34,7 @@ public class ImportDialog extends JDialog {
 	private JButton okBtn;
 	private JList<Card> listCards;
 	private DefaultListModel<Card> listModel;
+	private CategoryComboBox cmbCat;
 
 	public ImportDialog(JFrame parent, Lesson inputLesson) {
 		super(parent,true);
@@ -50,16 +50,34 @@ public class ImportDialog extends JDialog {
 	public List<Card> getSelectedCards() {
 		return selectedCards;
 	}
+	
+	public Category getSelectedCat(){
+		return getCat().getSelectedCategory();
+	}
 
 	private void initComponents() {
 		setLayout(new BorderLayout());
 		JScrollPane jscroll = new JScrollPane(getList());
 		jscroll.setPreferredSize(new Dimension(400, 500));
+		JPanel north = new JPanel();
+		north.setLayout(new BorderLayout());
+		north.add(new JLabel("Target Category:"),BorderLayout.WEST);
+		north.add(getCat(),BorderLayout.CENTER);
+		add(north,BorderLayout.NORTH);
 		add(jscroll, BorderLayout.CENTER);
 		JPanel south = new JPanel();
 		south.add(getOkBtn());
 		south.add(getCancleBtn());
 		add(south,BorderLayout.SOUTH);
+	}
+
+	private CategoryComboBox getCat() {
+		if(cmbCat == null){
+			cmbCat = new CategoryComboBox();
+			cmbCat.setRootCategory(Main.getInstance().getLesson().getRootCategory());
+			cmbCat.setSelectedCategory(Main.getInstance().getLesson().getRootCategory());
+		}
+		return cmbCat;
 	}
 
 	private JButton getCancleBtn() {
