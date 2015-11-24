@@ -1,329 +1,316 @@
 <project name="jMemorizePlus1" basedir="." default="compile">
-    <description>jMemorize+1 Project.</description>
-	
-	
+	<description>jMemorize+1 Project.</description>
 
-    <property name="project.version" value="v0.1.3alpha" />
 
-    <!-- set global properties for this build -->
-    <property name="src" value="src" />
-    <property name="build" value="binb" />
-    <property name="dist" value="dist" />
-    <property name="win" value="win" />
 
-    <property name="checks-base" value="checkstyle_config" />
-    <property name="checks-src" value="${checks-base}/src" />
-    <property name="checks-bin" value="${checks-base}/bin" />
-    <property name="checks-jar" value="${checks-base}/jar" />
-    <property name="checks-lib" value="${checks-base}/lib" />
+	<property name="project.version" value="v0.1.3alpha" />
 
-    <property name="dist.bin.temp" value="dist-bin-temp" />
-    <property name="dist.src.temp" value="dist-src-temp" />
-    <property name="dist.win.temp" value="dist-win-temp" />
+	<!-- set global properties for this build -->
+	<property name="src" value="src" />
+	<property name="build" value="binb" />
+	<property name="dist" value="dist" />
+	<property name="win" value="win" />
 
-    <property name="test.report" value="test-report" />
-    <property name="test.output" value="test-report/output" />
+	<property name="checks-base" value="checkstyle_config" />
+	<property name="checks-src" value="${checks-base}/src" />
+	<property name="checks-bin" value="${checks-base}/bin" />
+	<property name="checks-jar" value="${checks-base}/jar" />
+	<property name="checks-lib" value="${checks-base}/lib" />
 
-    <property name="lib" value="lib" />
-    <property name="resource" value="resource" />
-    <property name="lesson" value="lessons" />
-    <property name="test" value="test" />
+	<property name="dist.bin.temp" value="dist-bin-temp" />
+	<property name="dist.src.temp" value="dist-src-temp" />
+	<property name="dist.win.temp" value="dist-win-temp" />
 
-    <property name="dist.statcvs" value="cvs-stats" />
-    <property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
+	<property name="test.report" value="test-report" />
+	<property name="test.output" value="test-report/output" />
 
-    <property name="project.name" value="jMemorizePlus1" />
-    <property name="project.file" value="${project.name}-${project.version}" />
+	<property name="lib" value="lib" />
+	<property name="resource" value="resource" />
+	<property name="lesson" value="lessons" />
+	<property name="test" value="test" />
 
-    <path id="project.class.path">
-        <pathelement location="${java.class.path}/" />
+	<property name="dist.statcvs" value="cvs-stats" />
+	<property name="lib.statcvs" value="etc/statcvs/statcvs.jar" />
 
-        <pathelement location="${lib}/csv.jar" />
-        <pathelement location="${lib}/jcommon-1.0.8.jar" />
-        <pathelement location="${lib}/jfreechart-1.0.4.jar" />
-        <pathelement location="${lib}/servlet.jar" />
-        <pathelement location="${lib}/junit.jar" />
-        <pathelement location="${lib}/forms-1.0.5.jar" />
-        <pathelement location="${lib}/itext-1.4.8.jar" />
-		<pathelement location="${lib}/svnjavahl.jar" /> 
+	<property name="project.name" value="jMemorizePlus1" />
+	<property name="project.file" value="${project.name}-${project.version}" />
+
+	<path id="project.class.path">
+		<pathelement location="${java.class.path}/" />
+
+		<pathelement location="${lib}/csv.jar" />
+		<pathelement location="${lib}/jcommon-1.0.8.jar" />
+		<pathelement location="${lib}/jfreechart-1.0.4.jar" />
+		<pathelement location="${lib}/servlet.jar" />
+		<pathelement location="${lib}/junit.jar" />
+		<pathelement location="${lib}/forms-1.0.5.jar" />
+		<pathelement location="${lib}/itext-1.4.8.jar" />
+		<pathelement location="${lib}/svnjavahl.jar" />
 		<pathelement location="${lib}/svnant.jar" />
 		<pathelement location="${lib}/svnClientAdapter.jar" />
-        <pathelement location="${lib}/AppleJavaExtensions.jar" />
-    	
-    	<pathelement location="${lib}/dropbox-core-sdk-1.8.2.jar" />
-        <pathelement location="${lib}/jackson-core-2.6.1.jar" />
-    </path>
+		<pathelement location="${lib}/AppleJavaExtensions.jar" />
 
-    <path id="checks.build.class.path">
-        <pathelement location="${checks-lib}/checkstyle-all-4.3.jar" />    
-    </path>
+		<pathelement location="${lib}/jl1.0.jar" />
+		<pathelement location="${lib}/jogg-0.0.7.jar" />
+		<pathelement location="${lib}/jorbis-0.0.15.jar" />
+		<pathelement location="${lib}/jspeex0.9.7.jar" />
+		<pathelement location="${lib}/mp3spi1.9.4.jar" />
+		<pathelement location="${lib}/tritonus_share.jar" />
+		<pathelement location="${lib}/vorbisspi1.0.2.jar" />
 
-    <path id="checks.run.class.path">
-        <pathelement location="${checks-lib}/checkstyle-all-4.3.jar" />    
-        <pathelement location="${checks-jar}/jmemorize-style-checks.jar" />    
-    </path>
-    
-    <!-- fill in your dirs if you want to build the windows installer -->
-    <property name="dir.launch4j" value="C:\Program Files\Launch4j" />
-    <property name="dir.nsis" value="C:\Program Files\NSIS" />
+		<pathelement location="${lib}/dropbox-core-sdk-1.8.2.jar" />
+		<pathelement location="${lib}/jackson-core-2.6.1.jar" />
+	</path>
 
-    <target name="init">
-        <!-- Create the time stamp -->
-        <tstamp />
-    </target>
+	<path id="checks.build.class.path">
+		<pathelement location="${checks-lib}/checkstyle-all-4.3.jar" />
+	</path>
 
-    <!-- load the svn task -->
-    <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="project.class.path" />
+	<path id="checks.run.class.path">
+		<pathelement location="${checks-lib}/checkstyle-all-4.3.jar" />
+		<pathelement location="${checks-jar}/jmemorize-style-checks.jar" />
+	</path>
 
-    <target name="svn-status" depends="init" description="Determine the svn status">
+	<!-- fill in your dirs if you want to build the windows installer -->
+	<property name="dir.launch4j" value="C:\Program Files\Launch4j" />
+	<property name="dir.nsis" value="C:\Program Files\NSIS" />
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+	</target>
+
+	<!-- load the svn task -->
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="project.class.path" />
+
+	<target name="svn-status" depends="init" description="Determine the svn status">
 		<svn>
-		  <wcVersion path="${basedir}" prefix="svn."/>
+			<wcVersion path="${basedir}" prefix="svn." />
 		</svn>
-		<echo message="current revision: ${svn.revision.max-with-flags}"/>
-    </target>
+		<echo message="current revision: ${svn.revision.max-with-flags}" />
+	</target>
 
-    <target name="compile" depends="init" description="Compile the source">
-        <mkdir dir="${build}" />
+	<target name="compile" depends="init" description="Compile the source">
+		<mkdir dir="${build}" />
 
-        <!-- Compile the java code from ${src} into ${build} -->
-        <javac srcdir="${src}" destdir="${build}"  deprecation="true">
-            <classpath refid="project.class.path" />
-        </javac>
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" deprecation="true">
+			<classpath refid="project.class.path" />
+		</javac>
 
-        <!-- Convert translations from native format to ascii format -->
-        <native2ascii encoding="UTF-8" src="${resource}/text" dest="${build}/${resource}/text" 
-            includes="translation_*.native" ext=".properties"/>
-        
-        <copy todir="${build}/${resource}">
-            <fileset dir="${resource}" />
-        </copy>
+		<!-- Convert translations from native format to ascii format -->
+		<native2ascii encoding="UTF-8" src="${resource}/text" dest="${build}/${resource}/text" includes="translation_*.native" ext=".properties" />
 
-        <!-- For missing keys use the english translation as fall-back -->
-        <copy tofile="${build}/${resource}/text/translation.properties" 
-            file="${build}/${resource}/text/translation_en.properties" />
+		<copy todir="${build}/${resource}">
+			<fileset dir="${resource}" />
+		</copy>
 
-        <!-- create property file to read properties from program -->
-        <propertyfile file="${build}/${resource}/${project.name}.properties">
-            <entry key="filename" value="${project.file}.jar" />
-            <entry key="project.name" value="${project.name}" />
-            <entry key="project.version" value="${project.version}" />
-            <entry key="buildId" value="${DSTAMP}${TSTAMP}" />
-            <entry key="project.release" value="${project.release}" />
-		    <entry key="project.revision" value="${svn.revision.max-with-flags}"/>
-        </propertyfile>
+		<!-- For missing keys use the english translation as fall-back -->
+		<copy tofile="${build}/${resource}/text/translation.properties" file="${build}/${resource}/text/translation_en.properties" />
 
-        <!-- License will be read from about dialog -->
-        <copy tofile="${build}/LICENSE" file="LICENSE" />
-    </target>
+		<!-- create property file to read properties from program -->
+		<propertyfile file="${build}/${resource}/${project.name}.properties">
+			<entry key="filename" value="${project.file}.jar" />
+			<entry key="project.name" value="${project.name}" />
+			<entry key="project.version" value="${project.version}" />
+			<entry key="buildId" value="${DSTAMP}${TSTAMP}" />
+			<entry key="project.release" value="${project.release}" />
+			<entry key="project.revision" value="${svn.revision.max-with-flags}" />
+		</propertyfile>
 
-    <target name="run" depends="compile" description="Starts the jMemorize application">
-        <!-- backup your lesson dir. this is usefull if you are playing around 
+		<!-- License will be read from about dialog -->
+		<copy tofile="${build}/LICENSE" file="LICENSE" />
+	</target>
+
+	<target name="run" depends="compile" description="Starts the jMemorize application">
+		<!-- backup your lesson dir. this is usefull if you are playing around 
 		with the lesson format.-->
-        <copy todir="${lesson}-bak">
-            <fileset dir="${lesson}" />
-        </copy>
+		<copy todir="${lesson}-bak">
+			<fileset dir="${lesson}" />
+		</copy>
 
-        <java classpath="${build}" classname="jmemorize.core.Main" fork="true">
-            <classpath refid="project.class.path" />
-	    	<jvmarg value="-ea" />
-        </java>
-    </target>
+		<java classpath="${build}" classname="jmemorize.core.Main" fork="true">
+			<classpath refid="project.class.path" />
+			<jvmarg value="-ea" />
+		</java>
+	</target>
 
-    <target name="dist-init" depends="init">
-        <property name="project.release" value="true" />
-<!--		<fail if="svn.modified"/> 
+	<target name="dist-init" depends="init">
+		<property name="project.release" value="true" />
+		<!--		<fail if="svn.modified"/> 
 		<fail if="svn.mixed"/> -->
-    </target>
+	</target>
 
-    <target name="dist-bin" depends="clean, dist-init, compile" 
-        description="generate the distribution">
+	<target name="dist-bin" depends="clean, dist-init, compile" description="generate the distribution">
 
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist.bin.temp}" />
-        <mkdir dir="${dist}/${project.version}" />
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist.bin.temp}" />
+		<mkdir dir="${dist}/${project.version}" />
 
-        <!-- Copy everything besides tests -->
-        <copy todir="${dist.bin.temp}">
-            <fileset dir="${build}">
-                <exclude name="**/test/" />
-            </fileset>
-        </copy>
+		<!-- Copy everything besides tests -->
+		<copy todir="${dist.bin.temp}">
+			<fileset dir="${build}">
+				<exclude name="**/test/" />
+			</fileset>
+		</copy>
 
-        <!-- Unjar all libraries (besides junit) to be included into dist jar -->
-        <unjar dest="${dist.bin.temp}">
-            <fileset dir="${lib}">
-                <include name="*.jar" />
-                <exclude name="junit.jar" />
-                <exclude name="svn*.jar" />
-            </fileset>
-        </unjar>
+		<!-- Unjar all libraries (besides junit) to be included into dist jar -->
+		<unjar dest="${dist.bin.temp}">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+				<exclude name="junit.jar" />
+				<exclude name="svn*.jar" />
+			</fileset>
+		</unjar>
 
-        <!-- Delete META-INF folder that was created by other packages -->
-        <delete includeemptydirs="true">
-            <fileset dir="${dist.bin.temp}/META-INF" />
-        </delete>
+		<!-- Delete META-INF folder that was created by other packages -->
+		<delete includeemptydirs="true">
+			<fileset dir="${dist.bin.temp}/META-INF" />
+		</delete>
 
-        <manifest file="MANIFEST.MF">
-            <attribute name="Main-Class" value="jmemorize.core.Main" />
-        </manifest>
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="jmemorize.core.Main" />
+		</manifest>
 
-        <!-- Put everything in ${dist} into a jar -->
-        <jar jarfile="${dist}/${project.version}/${project.file}.jar" 
-            basedir="${dist.bin.temp}" manifest="MANIFEST.MF" />
+		<!-- Put everything in ${dist} into a jar -->
+		<jar jarfile="${dist}/${project.version}/${project.file}.jar" basedir="${dist.bin.temp}" manifest="MANIFEST.MF" />
 
-        <delete file="MANIFEST.MF" />
-    </target>
+		<delete file="MANIFEST.MF" />
+	</target>
 
-    <target name="dist-src" depends="clean, dist-init" 
-        description="Generate the source code distribution">
+	<target name="dist-src" depends="clean, dist-init" description="Generate the source code distribution">
 
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist.src.temp}/${project.file}" />
-        <mkdir dir="${dist}/${project.version}" />
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist.src.temp}/${project.file}" />
+		<mkdir dir="${dist}/${project.version}" />
 
-        <!-- Copy source files -->
-        <copy todir="${dist.src.temp}/${project.file}/${src}">
-            <fileset dir="${src}" />
-        </copy>
+		<!-- Copy source files -->
+		<copy todir="${dist.src.temp}/${project.file}/${src}">
+			<fileset dir="${src}" />
+		</copy>
 
-        <!-- Copy lib -->
-        <copy todir="${dist.src.temp}/${project.file}/${lib}">
-            <fileset dir="${lib}" />
-        </copy>
+		<!-- Copy lib -->
+		<copy todir="${dist.src.temp}/${project.file}/${lib}">
+			<fileset dir="${lib}" />
+		</copy>
 
-        <!-- Copy resources -->
-        <copy todir="${dist.src.temp}/${project.file}/${resource}">
-            <fileset dir="${resource}" />
-        </copy>
-        	
-        <!-- Copy fixtures -->
-        <copy todir="${dist.src.temp}/${project.file}/${test}">
-            <fileset dir="${test}" />
-        </copy>
-        
-        <!-- copy checkstyle -->
-        <copy todir="${dist.src.temp}/${project.file}/${checks-src}">
-            <fileset dir="${checks-src}" />
-        </copy>
-        
-        <copy todir="${dist.src.temp}/${project.file}/${checks-lib}">
-            <fileset dir="${checks-lib}" />
-        </copy>
-        
-        <copy todir="${dist.src.temp}/${project.file}/${checks-base}">
-            <fileset file="${checks-base}/*.xml" />
-            <fileset file="${checks-base}/gpl-header-check.txt" />
-        </copy>
-        
-        <!-- Copy additional files -->
-        <copy todir="${dist.src.temp}/${project.file}">
-            <fileset file="build.xml" />
-            <fileset file="README" />
-            <fileset file="CHANGELOG" />
-            <fileset file="LICENSE" />
-        </copy>
+		<!-- Copy resources -->
+		<copy todir="${dist.src.temp}/${project.file}/${resource}">
+			<fileset dir="${resource}" />
+		</copy>
 
-        <zip zipfile="${dist}/${project.version}/${project.file}-source.zip" 
-            basedir="${dist.src.temp}" />
-    </target>
+		<!-- Copy fixtures -->
+		<copy todir="${dist.src.temp}/${project.file}/${test}">
+			<fileset dir="${test}" />
+		</copy>
 
-    <target name="dist-win" depends="clean, dist-init, dist-bin" 
-        description="Generate a windows installer.">
+		<!-- copy checkstyle -->
+		<copy todir="${dist.src.temp}/${project.file}/${checks-src}">
+			<fileset dir="${checks-src}" />
+		</copy>
 
-        <mkdir dir="${dist.win.temp}" />
+		<copy todir="${dist.src.temp}/${project.file}/${checks-lib}">
+			<fileset dir="${checks-lib}" />
+		</copy>
 
-        <!-- jsmooth: wrap jar in exe -->
-        <copy file="${dist}/${project.version}/${project.file}.jar" 
-            tofile="${dist.win.temp}/jar.jar" />
-        <!-- jMem.xml is launch4j configuration, built manually -->
-    	<copy file="${dist}/jMem.xml" 
-    	            todir="${dist.win.temp}" />    	
-        <copy file="jMemorize.ico" todir="${dist.win.temp}" />
+		<copy todir="${dist.src.temp}/${project.file}/${checks-base}">
+			<fileset file="${checks-base}/*.xml" />
+			<fileset file="${checks-base}/gpl-header-check.txt" />
+		</copy>
 
-    	<exec executable="${dir.launch4j}/launch4jc.exe" dir="${dist.win.temp}">
-            <arg line="jMem.xml" />
-        </exec>
-        <move file="${dist.win.temp}/jar.exe" 
-            tofile="${dist.win.temp}/${project.file}.exe" />
+		<!-- Copy additional files -->
+		<copy todir="${dist.src.temp}/${project.file}">
+			<fileset file="build.xml" />
+			<fileset file="README" />
+			<fileset file="CHANGELOG" />
+			<fileset file="LICENSE" />
+		</copy>
 
-        <!-- generate setup -->
-        <copy file="${dist}/jMemorize.nsi.template" 
-            tofile="${dist.win.temp}/jMemorize.nsi" />
-        
-        <replace file="${dist.win.temp}/jMemorize.nsi" >
-            <replacefilter token="@setupfile" value="${project.file}-setup.exe" />
-            <replacefilter token="@exefile" value="${project.file}.exe" />
-        </replace>
-        
-        <copy file="LICENSE" tofile="${dist.win.temp}/gpl.txt" />
+		<zip zipfile="${dist}/${project.version}/${project.file}-source.zip" basedir="${dist.src.temp}" />
+	</target>
 
-        <exec executable="${dir.nsis}/makensis.exe" dir="${dist.win.temp}">
-            <arg line="jMemorize.nsi" />
-        </exec>
+	<target name="dist-win" depends="clean, dist-init, dist-bin" description="Generate a windows installer.">
 
-        <move file="${dist.win.temp}/${project.file}-setup.exe" 
-            todir="${dist}/${project.version}" />
-    </target>
+		<mkdir dir="${dist.win.temp}" />
 
-    <target name="dist-full" depends="dist-bin, dist-win" 
-        description="Create jar, src and win distribution" />
-    
-    <!-- This target needs the StatCVS Jar file location to be specified. -->
-    <target name="cvs stats" depends="compile" 
-        description="Generate statistical HTML report by using StatCVS">
+		<!-- jsmooth: wrap jar in exe -->
+		<copy file="${dist}/${project.version}/${project.file}.jar" tofile="${dist.win.temp}/jar.jar" />
+		<!-- jMem.xml is launch4j configuration, built manually -->
+		<copy file="${dist}/jMem.xml" todir="${dist.win.temp}" />
+		<copy file="jMemorize.ico" todir="${dist.win.temp}" />
 
-        <mkdir dir="${dist.statcvs}" />
-        <property name="csvroot" 
-            value=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/jmemorize" />
+		<exec executable="${dir.launch4j}/launch4jc.exe" dir="${dist.win.temp}">
+			<arg line="jMem.xml" />
+		</exec>
+		<move file="${dist.win.temp}/jar.exe" tofile="${dist.win.temp}/${project.file}.exe" />
 
-        <cvspass cvsroot="${csvroot}" password="" />
-        <cvs quiet="true" cvsroot="${csvroot}" command="log" 
-            output="${dist.statcvs}/cvs.log" />
+		<!-- generate setup -->
+		<copy file="${dist}/jMemorize.nsi.template" tofile="${dist.win.temp}/jMemorize.nsi" />
 
-        <taskdef classpath="${lib.statcvs}" name="statcvs" 
-            classname="net.sf.statcvs.ant.StatCvsTask" />
-        
-        <statcvs projectDirectory="${basedir}" 
-            cvsLogFile="${basedir}/${dist.statcvs}/cvs.log" 
-            outputDirectory="${basedir}/${dist.statcvs}" 
-            title="jMemorize" excludefiles="LICENSE" 
-            viewcvsurl="http://cvs.sourceforge.net/viewcvs.py/jmemorize/jmemorize/" />
-    </target>
+		<replace file="${dist.win.temp}/jMemorize.nsi">
+			<replacefilter token="@setupfile" value="${project.file}-setup.exe" />
+			<replacefilter token="@exefile" value="${project.file}.exe" />
+		</replace>
 
-    <target name="clean" description="clean up">
-        <!-- Delete the ${build} and ${dist} directory trees -->
-        <delete includeemptydirs="true" failonerror="false">
-            <fileset dir="${src}" includes="**/*.class" />
-            <fileset dir="${build}" />
-            <fileset dir="${dist.bin.temp}" />
-            <fileset dir="${dist.src.temp}" />
-            <fileset dir="${dist.win.temp}" />
-            <fileset dir="${resource}" includes="**/Thumbs.db" />
-        </delete>
-    </target>
+		<copy file="LICENSE" tofile="${dist.win.temp}/gpl.txt" />
 
-    <target name="test" depends="compile" description="run unit tests">
-        <delete dir="${test.report}"/>
-        <mkdir dir="${test.report}"/>
-        <mkdir dir="${test.output}"/>
-        
-        <junit printsummary="yes" fork="yes">
-            <classpath>
-                <path refid="project.class.path"/>
-                <pathelement location="${build}"/>
-            </classpath>
-            <formatter type="xml"/>
-	    	<jvmarg value="-ea"/>
-            <test name="jmemorize.core.test.AllTests" todir="${test.output}"/>
-        </junit>
-        
-        <junitreport todir="${test.report}">
-            <fileset dir="${test.output}">
-            	<include name="*.xml"/>
-            </fileset>
-            
-            <report format="frames" todir="${test.report}"/>
-        </junitreport>
-    </target>
+		<exec executable="${dir.nsis}/makensis.exe" dir="${dist.win.temp}">
+			<arg line="jMemorize.nsi" />
+		</exec>
+
+		<move file="${dist.win.temp}/${project.file}-setup.exe" todir="${dist}/${project.version}" />
+	</target>
+
+	<target name="dist-full" depends="dist-bin, dist-win" description="Create jar, src and win distribution" />
+
+	<!-- This target needs the StatCVS Jar file location to be specified. -->
+	<target name="cvs stats" depends="compile" description="Generate statistical HTML report by using StatCVS">
+
+		<mkdir dir="${dist.statcvs}" />
+		<property name="csvroot" value=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/jmemorize" />
+
+		<cvspass cvsroot="${csvroot}" password="" />
+		<cvs quiet="true" cvsroot="${csvroot}" command="log" output="${dist.statcvs}/cvs.log" />
+
+		<taskdef classpath="${lib.statcvs}" name="statcvs" classname="net.sf.statcvs.ant.StatCvsTask" />
+
+		<statcvs projectDirectory="${basedir}" cvsLogFile="${basedir}/${dist.statcvs}/cvs.log" outputDirectory="${basedir}/${dist.statcvs}" title="jMemorize" excludefiles="LICENSE" viewcvsurl="http://cvs.sourceforge.net/viewcvs.py/jmemorize/jmemorize/" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${src}" includes="**/*.class" />
+			<fileset dir="${build}" />
+			<fileset dir="${dist.bin.temp}" />
+			<fileset dir="${dist.src.temp}" />
+			<fileset dir="${dist.win.temp}" />
+			<fileset dir="${resource}" includes="**/Thumbs.db" />
+		</delete>
+	</target>
+
+	<target name="test" depends="compile" description="run unit tests">
+		<delete dir="${test.report}" />
+		<mkdir dir="${test.report}" />
+		<mkdir dir="${test.output}" />
+
+		<junit printsummary="yes" fork="yes">
+			<classpath>
+				<path refid="project.class.path" />
+				<pathelement location="${build}" />
+			</classpath>
+			<formatter type="xml" />
+			<jvmarg value="-ea" />
+			<test name="jmemorize.core.test.AllTests" todir="${test.output}" />
+		</junit>
+
+		<junitreport todir="${test.report}">
+			<fileset dir="${test.output}">
+				<include name="*.xml" />
+			</fileset>
+
+			<report format="frames" todir="${test.report}" />
+		</junitreport>
+	</target>
 
 </project>
