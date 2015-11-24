@@ -51,12 +51,12 @@ import javax.xml.transform.stream.StreamResult;
 import jmemorize.core.Card;
 import jmemorize.core.CardSide;
 import jmemorize.core.Category;
-import jmemorize.core.ImageRepository;
+import jmemorize.core.FileRepository;
 import jmemorize.core.Lesson;
 import jmemorize.core.LessonProvider;
 import jmemorize.core.Main;
 import jmemorize.core.Settings;
-import jmemorize.core.ImageRepository.ImageItem;
+import jmemorize.core.FileRepository.FileItem;
 import jmemorize.core.learn.LearnHistory;
 import jmemorize.core.learn.LearnHistory.SessionSummary;
 
@@ -335,14 +335,14 @@ public class XmlBuilder
      */
     public static File writeImageRepositoryToDisk(File dir) throws IOException
     {
-        ImageRepository repository = ImageRepository.getInstance();
+        FileRepository repository = FileRepository.getInstance();
         
         File imgDir = new File(dir + File.separator + IMAGE_FOLDER);
         imgDir.mkdirs();
         
         removeUnusedImages(repository, imgDir);
         
-        for (ImageItem item : repository.getImageItems())
+        for (FileItem item : repository.getFileItems())
         {
             File imgFile = new File(imgDir + File.separator + item.getId());
             
@@ -359,11 +359,11 @@ public class XmlBuilder
         return imgDir;
     }
 
-    private static void removeUnusedImages(ImageRepository repository, File imgDir)
+    private static void removeUnusedImages(FileRepository repository, File imgDir)
     {
         Set<File> unusedFiles = new HashSet<File>(Arrays.asList(imgDir.listFiles()));
         
-        for (ImageItem item : repository.getImageItems())
+        for (FileItem item : repository.getFileItems())
         {
             File imgFile = new File(imgDir + File.separator + item.getId());
             unusedFiles.remove(imgFile);
@@ -460,9 +460,9 @@ public class XmlBuilder
     private static void writeImageRepositoryToZip(ZipOutputStream zipOut) 
         throws IOException
     {
-        ImageRepository repository = ImageRepository.getInstance();
+        FileRepository repository = FileRepository.getInstance();
         
-        for (ImageItem item : repository.getImageItems())
+        for (FileItem item : repository.getFileItems())
         {
             zipOut.putNextEntry(new ZipEntry(IMAGE_FOLDER + File.separator + item.getId()));
             zipOut.write(item.getBytes());
@@ -611,7 +611,7 @@ public class XmlBuilder
     
     private static void loadImageRepositoryFromDisk(File dir)
     {
-        ImageRepository repository = ImageRepository.getInstance();
+        FileRepository repository = FileRepository.getInstance();
         
         File imgDir = new File(dir.getParent() + File.separator + IMAGE_FOLDER);
         File[] files = imgDir.listFiles();
@@ -640,7 +640,7 @@ public class XmlBuilder
     private static void loadImageFromZipEntry(InputStream in, ZipEntry entry) 
         throws IOException
     {
-        ImageRepository repository = ImageRepository.getInstance();
+        FileRepository repository = FileRepository.getInstance();
         
         String name = entry.getName();
         if (!name.startsWith(IMAGE_FOLDER))
@@ -660,7 +660,7 @@ public class XmlBuilder
             usedImageIDs.addAll(card.getBackSide().getImages());
         }
     
-        ImageRepository.getInstance().retain(usedImageIDs);
+        FileRepository.getInstance().retain(usedImageIDs);
     }
 
     private static String toInteger(float num)

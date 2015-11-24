@@ -37,7 +37,7 @@ import javax.swing.border.EtchedBorder;
 import jmemorize.core.Card;
 import jmemorize.core.Category;
 import jmemorize.core.FormattedText;
-import jmemorize.core.ImageRepository;
+import jmemorize.core.FileRepository;
 import jmemorize.core.Main;
 import jmemorize.core.Settings;
 import jmemorize.gui.LC;
@@ -236,7 +236,7 @@ public class NewCardFrame extends EscapableFrame
 
             Card card = new Card(frontside, backside);
             
-            ImageRepository repo = ImageRepository.getInstance();
+            FileRepository repo = FileRepository.getInstance();
             card.getFrontSide().setImages(repo.addImages(m_cardPanel.getFrontImages()));
             card.getBackSide().setImages(repo.addImages(m_cardPanel.getBackImages()));
         

@@ -156,6 +156,7 @@ public class MainFrame extends JFrame implements CategoryObserver,
         {
 //            UIManager.setLookAndFeel(new MetalLookAndFeel());
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.getDefaults().put("TextArea.font", UIManager.getFont("TextField.font"));
         }
         catch (Exception e)
         {

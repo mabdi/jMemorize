@@ -126,7 +126,7 @@ public class Main extends Observable implements LearnSessionProvider,
      */
     public void createNewLesson()
     {
-        ImageRepository.getInstance().clear();
+        FileRepository.getInstance().clear();
         setLesson(new Lesson(false));
     }
 
@@ -158,7 +158,7 @@ public class Main extends Observable implements LearnSessionProvider,
     {
         try
         {
-            ImageRepository.getInstance().clear();
+            FileRepository.getInstance().clear();
             
             Lesson lesson = new Lesson(false);
             XmlBuilder.loadFromXMLFile(file, lesson);

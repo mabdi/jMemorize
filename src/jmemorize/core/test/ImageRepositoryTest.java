@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import jmemorize.core.ImageRepository;
+import jmemorize.core.FileRepository;
 import jmemorize.core.Main;
 import jmemorize.core.io.XmlBuilder;
 import junit.framework.TestCase;
@@ -33,7 +33,7 @@ public class ImageRepositoryTest extends TestCase
 {
     private final static File TEST_DIR = new File("./images-test");
     
-    private ImageRepository m_ir = ImageRepository.getInstance();
+    private FileRepository m_ir = FileRepository.getInstance();
     
     @Override
     protected void setUp() throws Exception
@@ -96,47 +96,47 @@ public class ImageRepositoryTest extends TestCase
     public void testEmptyRepositoryAfterClear()
     {
         m_ir.clear();
-        assertEquals(0, m_ir.getImageItems().size());
+        assertEquals(0, m_ir.getFileItems().size());
     }
     
     public void testRepositoryClearedWhenCreatingNewProject() throws IOException
     {
         addImage("test.gif");
         addImage("more/test.gif");
-        assertEquals(2, m_ir.getImageItems().size());
+        assertEquals(2, m_ir.getFileItems().size());
         
         Main.getInstance().createNewLesson();
-        assertEquals(0, m_ir.getImageItems().size());
+        assertEquals(0, m_ir.getFileItems().size());
     }
     
     public void testRepositoryClearedWhenLoadingProject() throws IOException
     {
-        assertEquals(0, m_ir.getImageItems().size());
+        assertEquals(0, m_ir.getFileItems().size());
         
         Main.getInstance().loadLesson(new File("test/fixtures/simple_de.jml"));
-        assertEquals(0, m_ir.getImageItems().size());
+        assertEquals(0, m_ir.getFileItems().size());
         
         addImage("test.gif");
         addImage("more/test.gif");
-        assertEquals(2, m_ir.getImageItems().size());
+        assertEquals(2, m_ir.getFileItems().size());
         
         Main.getInstance().loadLesson(new File("test/fixtures/simple_de.jml"));
-        assertEquals(0, m_ir.getImageItems().size());
+        assertEquals(0, m_ir.getFileItems().size());
     }
     
     public void testRetainImages() throws IOException
     {
         addImage("test.gif");
         addImage("more/test.gif");
-        assertEquals(2, m_ir.getImageItems().size());
+        assertEquals(2, m_ir.getFileItems().size());
         
         Set<String> ids = new HashSet<String>();
         ids.add("test.gif");
         m_ir.retain(ids);
         
-        assertEquals(1, m_ir.getImageItems().size());
-        assertNotNull(m_ir.getImage("test.gif"));
-        assertNull(m_ir.getImage("more/test.gif"));
+        assertEquals(1, m_ir.getFileItems().size());
+        assertNotNull(m_ir.getItem("test.gif"));
+        assertNull(m_ir.getItem("more/test.gif"));
     }
     
     public void testSaveImagesToDisk() throws IOException

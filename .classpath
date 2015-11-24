@@ -14,5 +14,12 @@
 	<classpathentry kind="lib" path="lib/svnjavahl.jar"/>
 	<classpathentry kind="lib" path="lib/dropbox-core-sdk-1.8.2.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-2.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/jl1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jogg-0.0.7.jar"/>
+	<classpathentry kind="lib" path="lib/jorbis-0.0.15.jar"/>
+	<classpathentry kind="lib" path="lib/jspeex0.9.7.jar"/>
+	<classpathentry kind="lib" path="lib/mp3spi1.9.4.jar"/>
+	<classpathentry kind="lib" path="lib/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="lib/vorbisspi1.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

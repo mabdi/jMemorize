@@ -24,7 +24,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import jmemorize.core.CardSide;
-import jmemorize.core.ImageRepository;
+import jmemorize.core.FileRepository;
+import jmemorize.core.FileRepository.FileItem;
 import jmemorize.gui.LC;
 import jmemorize.gui.Localization;
 import jmemorize.gui.swing.CardFont;
@@ -50,8 +51,8 @@ public class ThinkQuiz implements Quiz
         
         m_answerPanel.setText(m_answerCardSide.getText());
         
-        ImageRepository repo = ImageRepository.getInstance();
-        List<ImageIcon> images = repo.toImageIcons(m_answerCardSide.getImages());
+        FileRepository repo = FileRepository.getInstance();
+        List<FileItem> images = repo.toFileItems(m_answerCardSide.getImages());
         m_answerPanel.setImages(images);
     }
 

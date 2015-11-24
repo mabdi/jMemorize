@@ -116,10 +116,12 @@ public class CardPanel extends JPanel
                     if (file == null)
                         return;
                     
-                    ImageIcon icon = new ImageIcon(file.toString());
-                    icon.setDescription(file.toString());
                     
-                    cardSidePanel.addImage(icon);
+                    
+//                    ImageIcon icon = new ImageIcon(file.toString());
+//                    icon.setDescription(file.toString());
+                    
+                    cardSidePanel.addCardFile(file.toString(),file);
                     editor.requestFocus();
                 }
             }

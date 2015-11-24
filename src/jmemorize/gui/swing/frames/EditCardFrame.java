@@ -40,7 +40,7 @@ import jmemorize.core.CardSide;
 import jmemorize.core.Category;
 import jmemorize.core.CategoryObserver;
 import jmemorize.core.FormattedText;
-import jmemorize.core.ImageRepository;
+import jmemorize.core.FileRepository;
 import jmemorize.core.Main;
 import jmemorize.core.Settings;
 import jmemorize.gui.LC;
@@ -435,10 +435,10 @@ public class EditCardFrame extends EscapableFrame implements CategoryObserver, S
         if (textChanged)
             return true;
         
-        if (!ImageRepository.equals(m_cardPanel.getFrontImages(), frontSide.getImages()))
+        if (!FileRepository.equals(m_cardPanel.getFrontImages(), frontSide.getImages()))
             return true;
         
-        if (!ImageRepository.equals(m_cardPanel.getBackImages(), backSide.getImages()))
+        if (!FileRepository.equals(m_cardPanel.getBackImages(), backSide.getImages()))
             return true;
 
         return false;
@@ -545,7 +545,7 @@ public class EditCardFrame extends EscapableFrame implements CategoryObserver, S
             FormattedText frontText = m_cardPanel.getFrontText();
             FormattedText backText = m_cardPanel.getBackText();
             
-            ImageRepository repo = ImageRepository.getInstance();
+            FileRepository repo = FileRepository.getInstance();
             
             List<String> frontIDs = repo.addImages(m_cardPanel.getFrontImages());
             List<String> backIDs = repo.addImages(m_cardPanel.getBackImages());

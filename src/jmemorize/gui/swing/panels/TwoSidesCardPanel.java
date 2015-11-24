@@ -25,8 +25,9 @@ import javax.swing.ImageIcon;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jmemorize.core.FileRepository;
+import jmemorize.core.FileRepository.FileItem;
 import jmemorize.core.FormattedText;
-import jmemorize.core.ImageRepository;
 import jmemorize.core.Settings;
 import jmemorize.core.Settings.CardFontObserver;
 import jmemorize.gui.LC;
@@ -130,7 +131,7 @@ public class TwoSidesCardPanel extends CardPanel implements CardFontObserver
     /**
      * @return all images belonging to the front side.
      */
-    public List<ImageIcon> getFrontImages()
+    public List<FileItem> getFrontImages()
     {
         return m_frontSide.getImages();
     }
@@ -138,7 +139,7 @@ public class TwoSidesCardPanel extends CardPanel implements CardFontObserver
     /**
      * @return all images belonging to the back side.
      */
-    public List<ImageIcon> getBackImages()
+    public List<FileItem> getBackImages()
     {
         return m_backSide.getImages();
     }
@@ -206,8 +207,8 @@ public class TwoSidesCardPanel extends CardPanel implements CardFontObserver
     
     private void setSideImages(CardSidePanel cardSide, List<String> ids)
     {
-        ImageRepository repo = ImageRepository.getInstance();
-        List<ImageIcon> images = repo.toImageIcons(ids);
+        FileRepository repo = FileRepository.getInstance();
+        List<FileItem> images = repo.toFileItems(ids);
         cardSide.setImages(images);
     }
 }

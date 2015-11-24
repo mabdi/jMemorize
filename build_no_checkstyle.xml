@@ -3,11 +3,11 @@
 	
 	
 
-    <property name="project.version" value="v0.1.2alpha" />
+    <property name="project.version" value="v0.1.3alpha" />
 
     <!-- set global properties for this build -->
     <property name="src" value="src" />
-    <property name="build" value="bin" />
+    <property name="build" value="binb" />
     <property name="dist" value="dist" />
     <property name="win" value="win" />
 
