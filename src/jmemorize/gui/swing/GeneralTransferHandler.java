@@ -33,6 +33,7 @@ import javax.swing.text.StyledDocument;
 
 import jmemorize.core.Card;
 import jmemorize.core.Category;
+import jmemorize.core.FileRepository.FileItem;
 import jmemorize.core.FormattedText;
 import jmemorize.core.Main;
 import jmemorize.gui.swing.panels.CardSidePanel;
@@ -248,7 +249,7 @@ public class GeneralTransferHandler extends TransferHandler {
 								// ImageIcon icon = new ImageIcon(url);
 								// icon.setDescription(link);
 
-								m_cardSidePanel.addCardFile(link, new File(url.toURI()));
+								m_cardSidePanel.addCardFile(new FileItem(link, new File(url.toURI())));
 								m_cardSidePanel.getTextPane().requestFocus();
 
 								return true;

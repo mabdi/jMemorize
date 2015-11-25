@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,7 +98,7 @@ public class FileRepository {
 		}
 
 		public String getText() {
-			return new String(m_bytes);
+			return new String(m_bytes, StandardCharsets.UTF_8);
 		}
 
 		public BasicPlayer getSound() {

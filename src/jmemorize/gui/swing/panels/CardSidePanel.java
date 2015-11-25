@@ -257,12 +257,8 @@ public class CardSidePanel extends JPanel {
 		}
 	}
 
-	public void addCardFile(String name,File file) {
-		try {
-			m_images.add(new FileItem(name,file));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void addCardFile(FileItem filei) {
+		m_images.add(filei);
 		m_currentImage = m_images.size() - 1;
 
 		updateImage();

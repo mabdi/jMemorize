@@ -3,7 +3,7 @@
 
 
 
-	<property name="project.version" value="v0.1.3alpha" />
+	<property name="project.version" value="v0.2.0alpha" />
 
 	<!-- set global properties for this build -->
 	<property name="src" value="src" />

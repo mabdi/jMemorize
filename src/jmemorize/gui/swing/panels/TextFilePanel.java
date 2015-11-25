@@ -1,6 +1,7 @@
 package jmemorize.gui.swing.panels;
 
 import java.awt.BorderLayout;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,6 +25,7 @@ public class TextFilePanel extends JPanel {
 		if(contentBox == null){
 			contentBox = new JTextArea();
 			contentBox.setEditable(false);
+			
 		}
 		return contentBox;
 	}
