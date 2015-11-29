@@ -61,7 +61,7 @@ public class FileRepository {
 		private byte[] m_bytes;
 		private String m_id;
 		private int type;
-		private String m_desc;
+		// private String m_desc;
 
 		public static final int TYPE_UNKNOWN = 0;
 		public static final int TYPE_SOUND = 100;
@@ -72,7 +72,7 @@ public class FileRepository {
 			m_sourceFile = filename;
 			m_id = createId(filename);
 			m_bytes = readFile(in);
-			setDescription(IMG_ID_PREFIX + m_id);
+			// setDescription(m_id);
 		}
 
 		public FileItem(String name, File image) throws IOException {
@@ -80,7 +80,7 @@ public class FileRepository {
 			InputStream in = new FileInputStream(image);
 			m_bytes = readFile(in);
 			m_id = createId(m_sourceFile);
-			setDescription(IMG_ID_PREFIX + m_id);
+			// setDescription(m_id);
 		}
 
 		public int getFileType() {
@@ -180,13 +180,13 @@ public class FileRepository {
 			return bytesOut.toByteArray();
 		}
 
-		public String getDescription() {
-			return m_desc;
-		}
-
-		public void setDescription(String string) {
-			m_desc = string;
-		}
+		// public String getDescription() {
+		// return m_desc;
+		// }
+		//
+		// public void setDescription(String string) {
+		// m_desc = string;
+		// }
 	}
 
 	// TODO remove singleton pattern and make this referenced from lesson
@@ -245,33 +245,29 @@ public class FileRepository {
 		return id;
 	}
 
-	public String addImage(FileItem icon) throws IOException {
-		String description = icon.getDescription();
-
-		String id = "";
-		if (description.startsWith(IMG_ID_PREFIX)) {
-			id = description.substring(IMG_ID_PREFIX.length());
-		} else {
-			InputStream in;
-			String name = "";
-
-			try {
-				URL url = new URL(description);
-				name = new File(url.getPath()).getName();
-				in = url.openStream();
-			} catch (MalformedURLException ex) {
-				name = new File(description).getName();
-				in = new FileInputStream(description);
-
-				// fallthrough expected
-			}
-
-			id = addImage(in, name);
-			icon.setDescription(IMG_ID_PREFIX + id);
-		}
-
-		return id;
-	}
+//	public String addImage(FileItem icon) throws IOException {
+//		// String description = icon.getDescription();
+//
+//		String id = icon.getId();
+//		InputStream in;
+//		String name = "";
+//
+//		try {
+//			URL url = new URL(description);
+//			name = new File(url.getPath()).getName();
+//			in = url.openStream();
+//		} catch (MalformedURLException ex) {
+//			name = new File(description).getName();
+//			in = new FileInputStream(description);
+//
+//			// fallthrough expected
+//		}
+//
+//		id = addImage(in, name);
+//		// icon.setDescription(IMG_ID_PREFIX + id);
+//
+//		return id;
+//	}
 
 	/**
 	 * Converts the given list of image icons into a list of image IDs. This is
@@ -283,11 +279,10 @@ public class FileRepository {
 	public List<String> addImages(List<FileItem> images) {
 		List<String> imageIDs = new LinkedList<String>();
 		for (FileItem icon : images) {
-			try {
-				imageIDs.add(addImage(icon));
-			} catch (IOException e) {
-				Main.logThrowable("could not convert image to image-id", e);
-			}
+			// imageIDs.add(addImage(icon));
+			String id = icon.getId();
+			m_imageMap.put(id, icon);
+			imageIDs.add(id);
 		}
 
 		return imageIDs;
@@ -316,17 +311,17 @@ public class FileRepository {
 			return false;
 
 		for (FileItem icon : images) {
-			String id = "";
-			String description = icon.getDescription();
+			String id = icon.getId();
+			// String description = icon.getDescription();
 
-			if (description.startsWith(IMG_ID_PREFIX)) {
-				id = description.substring(IMG_ID_PREFIX.length());
+			// if (description.startsWith(IMG_ID_PREFIX)) {
+			// id = description.substring(IMG_ID_PREFIX.length());
 
-				if (!ids.contains(id))
-					return false;
-			} else {
+			if (!ids.contains(id))
 				return false;
-			}
+			// } else {
+			// return false;
+			// }
 		}
 
 		return true;

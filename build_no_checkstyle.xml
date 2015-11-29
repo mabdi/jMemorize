@@ -3,7 +3,7 @@
 
 
 
-	<property name="project.version" value="v0.2.0alpha" />
+	<property name="project.version" value="v0.2.1alpha" />
 
 	<!-- set global properties for this build -->
 	<property name="src" value="src" />
@@ -242,14 +242,14 @@
 		<exec executable="${dir.launch4j}/launch4jc.exe" dir="${dist.win.temp}">
 			<arg line="jMem.xml" />
 		</exec>
-		<move file="${dist.win.temp}/jar.exe" tofile="${dist.win.temp}/${project.file}.exe" />
+		<move file="${dist.win.temp}/jar.exe" tofile="${dist.win.temp}/jMemorizePlus1.exe" />
 
 		<!-- generate setup -->
 		<copy file="${dist}/jMemorize.nsi.template" tofile="${dist.win.temp}/jMemorize.nsi" />
 
 		<replace file="${dist.win.temp}/jMemorize.nsi">
 			<replacefilter token="@setupfile" value="${project.file}-setup.exe" />
-			<replacefilter token="@exefile" value="${project.file}.exe" />
+			<replacefilter token="@exefile" value="jMemorizePlus1.exe" />
 		</replace>
 
 		<copy file="LICENSE" tofile="${dist.win.temp}/gpl.txt" />

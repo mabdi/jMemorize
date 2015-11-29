@@ -1,23 +1,52 @@
 package jmemorize.tools.pearson;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import javax.swing.JOptionPane;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import jmemorize.core.Card;
+import jmemorize.core.FileRepository;
+import jmemorize.core.FileRepository.FileItem;
 
 public class PearsonHelper {
 
 	private final static String URL = "https://api.pearson.com/v2/dictionaries/ldoce5/entries?headword=";
 
 	public void applyOnCard(Card card) {
+		String word = card.getFrontSide().getText().getUnformatted().trim();
+		String s;
+		try {
+			s = new PearsonHelper().getWordData(word);
+		} catch (SocketTimeoutException e3) {
+			JOptionPane.showMessageDialog(null, "Time Out. Try Again.", "Error On " + word, JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (IOException e2) {
 
+			e2.printStackTrace();
+			return;
+		}
+		if (s.length() > 0) {
+			InputStream stream = new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+			try {
+				
+				String id = FileRepository.getInstance().addImage(stream, word + ".txt");
+				card.getBackSide().addImage(id);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	public String getWordData(String word) throws IOException {

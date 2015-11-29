@@ -93,6 +93,14 @@ public class CardSide implements Cloneable
         }
     }
     
+    public void addImage(String id){
+    	m_imageIDs.add(id);
+    	for (CardSideObserver observer : m_observers)
+        {
+            observer.onImagesChanged(this, m_imageIDs);
+        }
+    }
+    
     public void addObserver(CardSideObserver observer)
     {
         m_observers.add(observer);

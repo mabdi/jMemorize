@@ -75,6 +75,7 @@ import jmemorize.gui.swing.actions.edit.RemoveAction;
 import jmemorize.gui.swing.actions.edit.ResetCardAction;
 import jmemorize.gui.swing.frames.MainFrame;
 import jmemorize.gui.swing.panels.StatusBar;
+import jmemorize.tools.pearson.PearsonUpdateAction;
 import jmemorize.util.Arrow;
 import jmemorize.util.PreferencesTool;
 import jmemorize.util.ReverseOrder;
@@ -943,6 +944,7 @@ public class CardTable extends JTable implements Settings.CardFontObserver, Sele
 		menu.add(new EditCardAction(this));
 		menu.add(new ResetCardAction(this));
 		menu.add(new RemoveAction(this));
+		menu.add(new PearsonUpdateAction(this));
 		menu.addSeparator();
 
 		menu.add(new CopyAction(this));

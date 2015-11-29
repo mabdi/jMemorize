@@ -33,6 +33,7 @@ public class TextFilePanel extends JPanel {
 	public void setTextToDisplay(String txt) {
 		m_text = txt;
 		getContentText().setText(m_text);
+		getContentText().setCaretPosition(0);
 	}
 
 }
